@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MeetMate - AI-Powered Event Planning Platform
 
 MeetMate is a modern social event platform that combines Firebase authentication, real-time event management, and AI-powered recommendations using Sensay AI. Built with React, TypeScript, Node.js, and Firebase.
@@ -261,3 +262,6 @@ For support, please open an issue in the GitHub repository or contact the develo
 ## 🔄 Updates
 
 Stay updated with the latest features and improvements by following the project repository.
+=======
+# MeetMate
+>>>>>>> 41073c7e4c31ed29019ac61ec2eb61f95860a506

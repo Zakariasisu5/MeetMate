@@ -408,7 +408,8 @@ const Schedule = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-gradient-to-br from-blue-900/60 via-purple-900/60 to-black/70 backdrop-blur-md"
+          style={{ background: 'linear-gradient(135deg, rgba(30,64,175,0.6) 0%, rgba(139,92,246,0.6) 50%, rgba(0,0,0,0.7) 100%)', backdropFilter: 'blur(8px)' }}
           onClick={() => setShowNewMeetingModal(false)}
         >
           <motion.div

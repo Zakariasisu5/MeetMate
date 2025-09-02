@@ -79,8 +79,8 @@ export const useCreateRSVP = () => {
     mutationFn: (data: CreateRSVPRequest) => ApiService.createRSVP(data),
     onSuccess: (_, variables) => {
       // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.eventRsvps(variables.eventId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.userRsvps });
+  queryClient.invalidateQueries({ queryKey: queryKeys.eventRsvps(variables.eventId) });
+  queryClient.invalidateQueries({ queryKey: ['rsvps', 'user'] });
       toast.success('RSVP updated successfully!');
     },
     onError: (error: any) => {

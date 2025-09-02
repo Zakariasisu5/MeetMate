@@ -5,7 +5,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base:process.env.vite_base_PATH || '/MeetMate',
+  base:process.env.VITE_BASE_PATH || '/MeetMate',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

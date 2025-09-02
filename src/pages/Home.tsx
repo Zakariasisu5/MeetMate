@@ -96,9 +96,9 @@ const Home = () => {
     <>
       <AnimatedBackground />
       
-      <div className="relative z-10 space-y-20">
+  <div className="relative z-10 flex flex-col gap-y-24">
         {/* Hero Section */}
-        <section className="text-center space-y-12 pt-20">
+  <section className="text-center space-y-12 pt-20 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -149,7 +149,7 @@ const Home = () => {
         </section>
 
         {/* Features Section */}
-        <section className="space-y-12">
+  <section className="space-y-12 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -194,7 +194,7 @@ const Home = () => {
         </section>
 
         {/* Stats Section */}
-        <section className="relative">
+  <section className="relative py-20">
           <GlassCard className="p-12 md:p-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -237,7 +237,7 @@ const Home = () => {
         </section>
 
         {/* Sample Profiles Section */}
-        <section className="space-y-12">
+  <section className="space-y-12 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -301,7 +301,7 @@ const Home = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="text-center space-y-8">
+  <section className="text-center space-y-8 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

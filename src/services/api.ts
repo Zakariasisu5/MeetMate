@@ -13,11 +13,10 @@ const api = axios.create({
 export const sendConnectionRequest = async (senderId: string, receiverId: string) => {
   const { auth } = await import('../config/firebase');
   const user = auth.currentUser;
-  console.log('Auth user:', user);
   if (!user) {
     throw new Error('Please login first');
   }
-  return api.post('/connections/request', { senderId, receiverId });
+  return api.post('/connections', { senderId, receiverId });
 };
 
 export const respondToConnection = async (connectionId: string, status: 'accepted' | 'declined') => {
@@ -167,12 +166,12 @@ export class ApiService {
   }
 
   static async chatWithAI(data: SensayChatRequest): Promise<SensayResponse> {
-    const response = await api.post('/ai/chat', data);
+    const response = await api.post('/api/ai-chat', data);
     return response.data;
   }
 
   static async getAIRecommendations(data: SensayRecommendationRequest): Promise<SensayResponse> {
-    const response = await api.post('/ai/recommend', data);
+    const response = await api.post('/api/ai-recommend', data);
     return response.data;
   }
 

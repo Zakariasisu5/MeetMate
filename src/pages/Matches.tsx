@@ -171,9 +171,8 @@ const Matches = () => {
       setLoadingId(null);
       return;
     }
-    const senderId = localStorage.getItem('senderId') || '';
     try {
-      localStorage.setItem('receiverId', matchId);
+      await ApiService.sendConnectionRequest(user.uid, matchId);
       setMatches(matches => matches.map(match =>
         match.id === matchId
           ? { ...match, isPending: true }
@@ -221,7 +220,7 @@ const Matches = () => {
         className="text-center space-y-4"
       >
         <div className="flex items-center justify-center space-x-2">
-          <Sparkles className="h-8 w-8 text-primary" />
+         
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">
             AI-Powered Matches
           </h1>

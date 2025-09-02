@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNotification } from './ui/NotificationProvider';
 import { useConnections } from '../hooks/useConnections';
 
 export function ConnectButton({ senderId, receiverId }: { senderId: string, receiverId: string }) {
   const { sendConnectionRequest } = useConnections();
+  const { notify } = useNotification();
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -12,8 +14,10 @@ export function ConnectButton({ senderId, receiverId }: { senderId: string, rece
     try {
       await sendConnectionRequest(senderId, receiverId);
       setSent(true);
+      notify('Connection request sent!', 'success');
     } catch (e: any) {
       setError(e.message);
+      notify(e.message || 'Failed to send request', 'error');
     }
     setLoading(false);
   };

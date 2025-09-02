@@ -211,7 +211,7 @@ const Matches = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+  <div className="max-w-7xl mx-auto space-y-8 px-2 sm:px-4 md:px-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -272,7 +272,7 @@ const Matches = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
       >
         <AnimatePresence>
           {filteredMatches.map((match, index) => (
@@ -282,10 +282,10 @@ const Matches = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="card space-y-4"
+              className="card space-y-4 p-4 sm:p-6"
             >
               {/* Header */}
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex items-center space-x-3">
                   <img
                     src={match.avatar}
@@ -303,7 +303,7 @@ const Matches = () => {
               </div>
 
               {/* Company and Location */}
-              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-muted-foreground gap-1 sm:gap-0">
                 <div className="flex items-center space-x-1">
                   <Building className="h-4 w-4" />
                   <span>{match.company}</span>
@@ -359,7 +359,7 @@ const Matches = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-2 pt-2">
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
                 {match.isConnected ? (
                   <div className="flex items-center space-x-2 text-sm text-green-600 bg-green-100 px-3 py-2 rounded-2xl w-full justify-center">
                     <CheckCircle className="h-4 w-4" />

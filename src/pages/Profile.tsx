@@ -164,40 +164,43 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto flex flex-col gap-y-24">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center space-y-4"
-      >
-        <div className="flex items-center justify-center space-x-2">
-          <Sparkles className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-            Smart Profile
-          </h1>
-        </div>
-        <p className="text-lg text-muted-foreground">
-          Create your profile to enable AI-powered matchmaking at conferences
-        </p>
-      </motion.div>
+      <section className="py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center space-y-4"
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <Sparkles className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Smart Profile
+            </h1>
+          </div>
+          <p className="text-lg text-muted-foreground">
+            Create your profile to enable AI-powered matchmaking at conferences
+          </p>
+        </motion.div>
+      </section>
 
       {/* Profile Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          {/* Basic Information */}
-          <div className="card space-y-6">
-            <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Basic Information</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Basic Information */}
+            <div className="card space-y-6">
+              <div className="flex items-center space-x-2">
+                <User className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold">Basic Information</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
                   Full Name *
@@ -427,19 +430,22 @@ const Profile = () => {
               <span>{isSubmitting ? 'Saving...' : 'Save Profile'}</span>
             </button>
           </div>
-        </form>
-      </motion.div>
+          </form>
+        </motion.div>
+      </section>
 
       {/* Web3 Integration Notice */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="card bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20"
-      >
-        
-      </motion.div>
-      <AIChatbot/>
+      <section className="py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="card bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20"
+        >
+          {/* You can add a notice or info here if needed */}
+        </motion.div>
+        <AIChatbot/>
+      </section>
     </div>
   )
 }

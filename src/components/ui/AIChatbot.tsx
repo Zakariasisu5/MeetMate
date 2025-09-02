@@ -21,6 +21,7 @@ const AIChatbot = () => {
     }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -47,23 +48,22 @@ const AIChatbot = () => {
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
-
+    console.log('[AIChatbot] handleSendMessage called, value:', inputValue);
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue,
       isUser: true,
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
-
+    // Blur input to close mobile keyboard
+    if (inputRef.current) inputRef.current.blur();
     setIsTyping(true);
     try {
-      // Call Sensay API
-  // Always send { prompt: ... } for backend compatibility
-  const chatRequest: SensayChatRequest = { prompt: userMessage.text };
-  const response = await ApiService.chatWithAI(chatRequest);
+      const chatRequest: SensayChatRequest = { prompt: userMessage.text };
+      const response = await ApiService.chatWithAI(chatRequest);
+      console.log('[AIChatbot] API response:', response);
       setIsTyping(false);
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -73,6 +73,7 @@ const AIChatbot = () => {
       }]);
     } catch (err) {
       setIsTyping(false);
+      console.error('[AIChatbot] API error:', err);
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         text: 'Sorry, there was an error connecting to the AI.',
@@ -93,7 +94,7 @@ const AIChatbot = () => {
     <>
       {/* Floating Chat Button */}
       <motion.button
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(59,130,246,0.8)] transition-all duration-300"
+        className="fixed bottom-4 right-4 z-50 w-14 h-14 sm:bottom-6 sm:right-6 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(59,130,246,0.8)] transition-all duration-300"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -128,7 +129,7 @@ const AIChatbot = () => {
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="fixed bottom-24 right-6 z-40 w-96 h-[500px] bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl"
+            className="fixed bottom-0 right-0 z-40 w-full h-full max-h-none bg-white/10 backdrop-blur-xl border-t border-l border-white/20 shadow-2xl rounded-none sm:bottom-24 sm:right-6 sm:w-96 sm:h-[500px] sm:rounded-2xl sm:border sm:max-h-[90vh] pb-24 sm:pb-0 touch-manipulation select-none"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -145,7 +146,7 @@ const AIChatbot = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-[350px]">
+            <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-[50vh] sm:max-h-[350px]">
               {messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -192,21 +193,24 @@ const AIChatbot = () => {
             <div className="p-4 border-t border-white/10">
               <div className="flex space-x-2">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me anything..."
-                  className="flex-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2 text-white placeholder-white/60 focus:outline-none focus:border-white/40"
+                  className="flex-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:border-white/40 text-base sm:text-sm"
+                  style={{ minHeight: 44 }}
                 />
                 <motion.button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim()}
-                  className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center disabled:opacity-50"
+                  className="w-12 h-12 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center disabled:opacity-50"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  style={{ minWidth: 44, minHeight: 44 }}
                 >
-                  <Send className="w-4 h-4 text-white" />
+                  <Send className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
                 </motion.button>
               </div>
             </div>

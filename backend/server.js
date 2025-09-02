@@ -13,11 +13,28 @@ setupSocket(server);
 // CORS: allow frontend origin in production
 const allowedOrigins = [
 	process.env.FRONTEND_URL || 'http://localhost:5173',
+	'https://meet-mate-ten.vercel.app', // <-- add your Vercel domain here
 ];
 app.use(cors({
 	origin: allowedOrigins,
 	credentials: true,
 }));
+	const allowedOrigins = [
+		process.env.FRONTEND_URL || 'http://localhost:5173',
+		'https://meet-mate-ten.vercel.app', // Vercel production frontend
+	];
+	app.use(cors({
+		origin: function (origin, callback) {
+			// allow requests with no origin (like mobile apps, curl, etc.)
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.indexOf(origin) !== -1) {
+				return callback(null, true);
+			} else {
+				return callback(new Error('Not allowed by CORS'));
+			}
+		},
+		credentials: true,
+	}));
 app.use(express.json());
 
 // Health check for Render

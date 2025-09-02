@@ -20,6 +20,7 @@ import GlassCard from '../components/ui/GlassCard'
 import NeonButton from '../components/ui/NeonButton'
 import AIChatbot from '../components/ui/AIChatbot'
 import ProfileCard from '../components/ui/ProfileCard'
+import { useFirebaseAuth } from '../hooks/useFirebaseAuth'
 import ConnectModal from '../components/ConnectModal'
 import MessageModal from '../components/MessageModal'
 import CalendarModal from '../components/CalendarModal'
@@ -87,6 +88,9 @@ const Home = () => {
       lastActive: '1 hour ago'
     }
   ];
+
+  const { user, userProfile } = useFirebaseAuth();
+  const isProfileComplete = userProfile && userProfile.name && userProfile.bio && userProfile.avatar;
 
   return (
     <>
@@ -261,11 +265,12 @@ const Home = () => {
                 <ProfileCard
                   user={user}
                   onConnect={() => {
-                    const senderId = localStorage.getItem('senderId') || '';
-                    if (!senderId) {
+                    if (!user) {
                       alert('You must be logged in to connect. Please log in or complete your profile.');
-                      // Optionally redirect to login/profile page:
-                      // window.location.href = '/login';
+                      return;
+                    }
+                    if (!isProfileComplete) {
+                      alert('Please complete your profile before connecting with others.');
                       return;
                     }
                     localStorage.setItem('receiverId', user.id);
@@ -273,11 +278,12 @@ const Home = () => {
                     setShowConnectModal(true);
                   }}
                   onMessage={() => {
-                    const senderId = localStorage.getItem('senderId') || '';
-                    if (!senderId) {
+                    if (!user) {
                       alert('You must be logged in to message. Please log in or complete your profile.');
-                      // Optionally redirect to login/profile page:
-                      // window.location.href = '/login';
+                      return;
+                    }
+                    if (!isProfileComplete) {
+                      alert('Please complete your profile before messaging others.');
                       return;
                     }
                     localStorage.setItem('receiverId', user.id);

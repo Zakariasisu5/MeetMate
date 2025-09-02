@@ -14,11 +14,9 @@ import {
 import { db } from '../config/firebase';
 import { Event, RSVP, User } from './api';
 
-// Real-time listeners management
 class RealtimeService {
   private listeners: Map<string, () => void> = new Map();
 
-  // Events real-time listeners
   subscribeToEvents(callback: (events: Event[]) => void): () => void {
     try {
       const q = query(
@@ -55,12 +53,10 @@ class RealtimeService {
       };
     } catch (error) {
       console.error('Failed to subscribe to events:', error);
-      // Return a no-op function if subscription fails
       return () => {};
     }
   }
 
-  // Single event real-time listener
   subscribeToEvent(eventId: string, callback: (event: Event | null) => void): () => void {
     const unsubscribe = onSnapshot(doc(db, 'events', eventId), (doc) => {
       if (doc.exists()) {
@@ -89,7 +85,6 @@ class RealtimeService {
     };
   }
 
-  // RSVPs real-time listeners
   subscribeToEventRSVPs(eventId: string, callback: (rsvps: RSVP[]) => void): () => void {
     const q = query(
       collection(db, 'rsvps'),
@@ -150,7 +145,6 @@ class RealtimeService {
     };
   }
 
-  // User real-time listener
   subscribeToUser(userId: string, callback: (user: User | null) => void): () => void {
     const unsubscribe = onSnapshot(doc(db, 'users', userId), (doc) => {
       if (doc.exists()) {
@@ -177,7 +171,6 @@ class RealtimeService {
     };
   }
 
-  // Create event in Firestore (syncs with backend)
   async createEvent(eventData: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const docRef = await addDoc(collection(db, 'events'), {
       ...eventData,
@@ -187,7 +180,6 @@ class RealtimeService {
     return docRef.id;
   }
 
-  // Update event in Firestore
   async updateEvent(eventId: string, updates: Partial<Event>): Promise<void> {
     const { id, createdAt, updatedAt, ...updateData } = updates;
     await updateDoc(doc(db, 'events', eventId), {
@@ -196,7 +188,6 @@ class RealtimeService {
     });
   }
 
-  // Create RSVP in Firestore
   async createRSVP(rsvpData: Omit<RSVP, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const docRef = await addDoc(collection(db, 'rsvps'), {
       ...rsvpData,
@@ -206,7 +197,6 @@ class RealtimeService {
     return docRef.id;
   }
 
-  // Update RSVP in Firestore
   async updateRSVP(rsvpId: string, updates: Partial<RSVP>): Promise<void> {
     const { id, createdAt, updatedAt, ...updateData } = updates;
     await updateDoc(doc(db, 'rsvps', rsvpId), {
@@ -215,7 +205,6 @@ class RealtimeService {
     });
   }
 
-  // Create/Update user in Firestore
   async createOrUpdateUser(userId: string, userData: Partial<User>): Promise<void> {
     const { id, createdAt, updatedAt, ...updateData } = userData;
     await updateDoc(doc(db, 'users', userId), {
@@ -224,7 +213,6 @@ class RealtimeService {
     });
   }
 
-  // Cleanup all listeners
   cleanup(): void {
     this.listeners.forEach((unsubscribe) => unsubscribe());
     this.listeners.clear();

@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
-const auth = require('../middleware/auth');
 
 // GET /messages/:id - fetch chat history with user :id
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const userId = req.user.id;
     const otherId = req.params.id;
@@ -21,7 +20,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // POST /messages/:id - send new message to user :id
-router.post('/:id', auth, async (req, res) => {
+router.post('/:id', async (req, res) => {
   try {
     const from = req.user.id;
     const to = req.params.id;

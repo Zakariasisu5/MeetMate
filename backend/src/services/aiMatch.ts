@@ -35,7 +35,6 @@ export async function findTopMatches(userId: string, topN = 3) {
       });
     }
   });
-  // Wait for all embeddings
   await new Promise(res => setTimeout(res, 2000));
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, topN).map(s => s.user);

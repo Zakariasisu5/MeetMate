@@ -16,8 +16,10 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react'
+
 import toast from 'react-hot-toast'
 import ApiService from '../services/api'
+import { useFirebaseAuth } from '../hooks/useFirebaseAuth'
 
 interface Match {
   id: string
@@ -36,6 +38,7 @@ interface Match {
 }
 
 const Matches = () => {
+  const { user, userProfile } = useFirebaseAuth();
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
   const [matches, setMatches] = useState<Match[]>([
@@ -154,29 +157,29 @@ const Matches = () => {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
 
+  const isProfileComplete = userProfile && userProfile.name && userProfile.bio && userProfile.avatar;
   const connectWithMatch = async (matchId: string) => {
     setLoadingId(matchId);
     setErrorId(null);
-    const senderId = localStorage.getItem('senderId') || '';
-    if (!senderId) {
+    if (!user) {
       toast.error('You must be logged in to connect. Please log in or complete your profile.');
       setLoadingId(null);
-      // Optionally redirect to login/profile page:
-      // window.location.href = '/login';
       return;
     }
+    if (!isProfileComplete) {
+      toast.error('Please complete your profile before connecting with others.');
+      setLoadingId(null);
+      return;
+    }
+    const senderId = localStorage.getItem('senderId') || '';
     try {
-      // Store senderId and receiverId in localStorage for useConnections
       localStorage.setItem('receiverId', matchId);
-      // Optionally: call your connection hook here
-      // await sendConnectionRequest(senderId, matchId);
       setMatches(matches => matches.map(match =>
         match.id === matchId
           ? { ...match, isPending: true }
           : match
       ));
       toast.success('Connection request sent!');
-      // Dispatch a custom event so dashboard can update
       window.dispatchEvent(new CustomEvent('connection:added', { detail: { receiverId: matchId } }));
     } catch (err) {
       setErrorId(matchId);

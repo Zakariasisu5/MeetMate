@@ -1,21 +1,21 @@
-import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.js';
-import { sensayService } from '../services/sensay.js';
-const router = Router();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const sensay_1 = require("../services/sensay");
+const router = (0, express_1.Router)();
 // POST /api/ai/chat - Chat with Sensay AI
-router.post('/chat', authenticateToken, async (req, res) => {
+router.post('/chat', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { prompt, context } = req.body;
-        const userId = req.user.uid;
-        if (!prompt) {
-            return res.status(400).json({ error: 'Prompt is required' });
+        const { message, context } = req.body;
+        const userId = req.user.id;
+        if (!message) {
+            return res.status(400).json({ error: 'Message is required' });
         }
         const request = {
-            prompt,
-            userId,
-            context,
+            message,
         };
-        const response = await sensayService.chat(request);
+        const response = await sensay_1.sensayService.chat(request);
         res.json(response);
     }
     catch (error) {
@@ -24,25 +24,18 @@ router.post('/chat', authenticateToken, async (req, res) => {
     }
 });
 // POST /api/ai/recommend - Get AI recommendations
-router.post('/recommend', authenticateToken, async (req, res) => {
+router.post('/recommend', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { preferences } = req.body;
-        const userId = req.user.uid;
-        if (!preferences || !preferences.interests) {
-            return res.status(400).json({ error: 'Preferences with interests are required' });
+        const { context } = req.body;
+        const userId = req.user.id;
+        if (!context) {
+            return res.status(400).json({ error: 'Context is required' });
         }
         const request = {
             userId,
-            preferences: {
-                interests: preferences.interests,
-                location: preferences.location,
-                dateRange: preferences.dateRange ? {
-                    start: new Date(preferences.dateRange.start),
-                    end: new Date(preferences.dateRange.end),
-                } : undefined,
-            },
+            context,
         };
-        const response = await sensayService.getRecommendations(request);
+        const response = await sensay_1.sensayService.getRecommendations(request);
         res.json(response);
     }
     catch (error) {
@@ -50,5 +43,5 @@ router.post('/recommend', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Failed to get recommendations' });
     }
 });
-export default router;
+exports.default = router;
 //# sourceMappingURL=ai.js.map

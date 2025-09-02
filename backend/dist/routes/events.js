@@ -1,25 +1,24 @@
-import { Router } from 'express';
-import { collections } from '../config/firebase.js';
-import { authenticateToken } from '../middleware/auth.js';
-const router = Router();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const firebase_1 = require("../config/firebase");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
 // POST /api/events - Create new event
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { title, description, date, location } = req.body;
-        const userId = req.user.uid;
-        if (!title || !description || !date || !location) {
+        const { name, date, location } = req.body;
+        const userId = req.user?.id;
+        if (!name || !date || !location) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
         const eventData = {
-            title,
-            description,
-            date: new Date(date),
+            name,
+            date: new Date(date).toISOString(),
             location,
-            createdBy: userId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdBy: userId || '',
         };
-        const docRef = await collections.events.add(eventData);
+        const docRef = await firebase_1.collections.events.add(eventData);
         const event = { id: docRef.id, ...eventData };
         res.status(201).json(event);
     }
@@ -31,18 +30,16 @@ router.post('/', authenticateToken, async (req, res) => {
 // GET /api/events - List all events
 router.get('/', async (req, res) => {
     try {
-        const snapshot = await collections.events
-            .orderBy('date', 'asc')
-            .get();
+        const snapshot = await firebase_1.collections.events.orderBy('date', 'asc').get();
         const events = [];
         snapshot.forEach((doc) => {
             const data = doc.data();
             events.push({
                 id: doc.id,
-                ...data,
-                date: data.date.toDate(),
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
+                name: data.name,
+                date: typeof data.date === 'string' ? data.date : data.date?.toDate?.().toISOString?.() || '',
+                location: data.location,
+                createdBy: data.createdBy,
             });
         });
         res.json(events);
@@ -56,17 +53,17 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const doc = await collections.events.doc(id).get();
+        const doc = await firebase_1.collections.events.doc(id).get();
         if (!doc.exists) {
             return res.status(404).json({ error: 'Event not found' });
         }
         const data = doc.data();
         const event = {
             id: doc.id,
-            ...data,
-            date: data.date.toDate(),
-            createdAt: data.createdAt.toDate(),
-            updatedAt: data.updatedAt.toDate(),
+            name: data.name,
+            date: typeof data.date === 'string' ? data.date : data.date?.toDate?.().toISOString?.() || '',
+            location: data.location,
+            createdBy: data.createdBy,
         };
         res.json(event);
     }
@@ -75,5 +72,5 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch event' });
     }
 });
-export default router;
+exports.default = router;
 //# sourceMappingURL=events.js.map

@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { auth } from '../config/firebase';
 
-// API base URL (should include /api)
 const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:3000/api';
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -12,7 +10,6 @@ const api = axios.create({
   },
 });
 
-// --- User Connections API ---
 export const sendConnectionRequest = async (senderId: string, receiverId: string) => {
   const { auth } = await import('../config/firebase');
   const user = auth.currentUser;
@@ -36,7 +33,6 @@ export const respondToConnection = async (connectionId: string, status: 'accepte
 export const getConnections = (userId: string) =>
   api.get(`/connections/${userId}`);
 
-// Request interceptor to add auth token
 api.interceptors.request.use(
   async (config) => {
     const user = auth.currentUser;
@@ -51,19 +47,16 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       console.error('Unauthorized access');
     }
     return Promise.reject(error);
   }
 );
 
-// Types
 export interface Event {
   id: string;
   title: string;
@@ -132,9 +125,7 @@ export interface SensayResponse {
   recommendations?: Event[];
 }
 
-// API service class
 export class ApiService {
-  // Events
   static async createEvent(data: CreateEventRequest): Promise<Event> {
     const response = await api.post('/api/events', data);
     return response.data;
@@ -150,7 +141,6 @@ export class ApiService {
     return response.data;
   }
 
-  // RSVPs
   static async createRSVP(data: CreateRSVPRequest): Promise<RSVP> {
     const response = await api.post('/api/rsvp', data);
     return response.data;
@@ -166,7 +156,6 @@ export class ApiService {
     return response.data;
   }
 
-  // Users
   static async createUser(data: CreateUserRequest): Promise<User> {
     const response = await api.post('/api/users', data);
     return response.data;
@@ -177,18 +166,16 @@ export class ApiService {
     return response.data;
   }
 
-  // AI Integration
   static async chatWithAI(data: SensayChatRequest): Promise<SensayResponse> {
-    const response = await api.post('/api/ai/chat', data);
+    const response = await api.post('/ai/chat', data);
     return response.data;
   }
 
   static async getAIRecommendations(data: SensayRecommendationRequest): Promise<SensayResponse> {
-    const response = await api.post('/api/ai/recommend', data);
+    const response = await api.post('/ai/recommend', data);
     return response.data;
   }
 
-  // Health check
   static async healthCheck(): Promise<{ status: string; timestamp: string }> {
     const response = await api.get('/health');
     return response.data;

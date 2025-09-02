@@ -1,10 +1,16 @@
-import axios from 'axios';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sensayService = void 0;
+const axios_1 = __importDefault(require("axios"));
 const SENSAY_API_KEY = process.env.SENSAY_API_KEY;
 const SENSAY_API_URL = process.env.SENSAY_API_URL || 'https://api.sensay.ai/v1';
 class SensayService {
     async makeRequest(endpoint, data) {
         try {
-            const response = await axios.post(`${SENSAY_API_URL}${endpoint}`, data, {
+            const response = await axios_1.default.post(`${SENSAY_API_URL}${endpoint}`, data, {
                 headers: {
                     'Authorization': `Bearer ${SENSAY_API_KEY}`,
                     'Content-Type': 'application/json',
@@ -19,69 +25,28 @@ class SensayService {
     }
     async chat(request) {
         const prompt = `You are MeetMate AI, a helpful assistant for event planning and social networking. 
-    User: ${request.prompt}
-    Context: ${request.context || 'General event planning assistance'}
+    User: ${request.message}
     
     Please provide helpful, friendly advice about event planning, social networking, or general assistance.`;
         const response = await this.makeRequest('/chat', {
             prompt,
-            user_id: request.userId,
         });
         return {
-            response: response.response || response.message || 'I apologize, but I couldn\'t process your request.',
+            reply: response.response || response.message || 'I apologize, but I couldn\'t process your request.',
         };
     }
     async getRecommendations(request) {
-        const prompt = `Based on the following user preferences, suggest relevant events or activities:
-    User ID: ${request.userId}
-    Interests: ${request.preferences.interests.join(', ')}
-    Location: ${request.preferences.location || 'Any location'}
-    Date Range: ${request.preferences.dateRange ?
-            `${request.preferences.dateRange.start.toISOString()} to ${request.preferences.dateRange.end.toISOString()}` :
-            'Any time'}
-    
-    Please provide personalized event recommendations and suggestions.`;
+        const prompt = `User context: ${request.context}\nPlease provide personalized event recommendations and suggestions.`;
         const response = await this.makeRequest('/chat', {
             prompt,
-            user_id: request.userId,
         });
-        // Parse recommendations from AI response
-        const recommendations = this.parseRecommendationsFromResponse(response.response || response.message);
+        // For now, just return the reply as a string array (split by newlines or periods)
+        const recommendations = (response.response || response.message || '').split(/\n|\./).map((s) => s.trim()).filter(Boolean);
         return {
-            response: response.response || response.message || 'Here are some recommendations for you!',
+            reply: response.response || response.message || 'Here are some recommendations for you!',
             recommendations,
         };
     }
-    parseRecommendationsFromResponse(aiResponse) {
-        // This is a simplified parser - in a real implementation, you might want to use
-        // structured output from the AI or implement more sophisticated parsing
-        const recommendations = [];
-        // Extract event-like suggestions from AI response
-        const eventPatterns = [
-            /(?:suggest|recommend|try|check out)\s+(.+?)(?:\.|$)/gi,
-            /(?:event|activity|meetup)\s+(?:like\s+)?(.+?)(?:\.|$)/gi,
-        ];
-        eventPatterns.forEach(pattern => {
-            const matches = aiResponse.match(pattern);
-            if (matches) {
-                matches.forEach((match, index) => {
-                    if (index < 3) { // Limit to 3 recommendations
-                        recommendations.push({
-                            id: `ai-recommendation-${Date.now()}-${index}`,
-                            title: match.replace(/^(?:suggest|recommend|try|check out)\s+/i, '').trim(),
-                            description: `AI recommended: ${match}`,
-                            date: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000), // Future dates
-                            location: 'TBD',
-                            createdBy: 'ai-assistant',
-                            createdAt: new Date(),
-                            updatedAt: new Date(),
-                        });
-                    }
-                });
-            }
-        });
-        return recommendations;
-    }
 }
-export const sensayService = new SensayService();
+exports.sensayService = new SensayService();
 //# sourceMappingURL=sensay.js.map

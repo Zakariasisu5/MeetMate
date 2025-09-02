@@ -17,6 +17,7 @@ import { useFirebaseAuth } from '../hooks/useFirebaseAuth'
 import Logo from './Logo'
 import ThemeToggle from './ui/ThemeToggle'
 import Footer from './Footer'
+import AIChat from './AIChat'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -230,9 +231,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
-      <br/><br/>
-      {/* Footer */}
       <Footer />
+      <AIChat />
     </div>
   )
 }

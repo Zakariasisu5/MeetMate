@@ -46,7 +46,6 @@ class SensayService {
       prompt,
     });
 
-    // For now, just return the reply as a string array (split by newlines or periods)
   const recommendations = (response.response || response.message || '').split(/\n|\./).map((s: string) => s.trim()).filter(Boolean);
 
     return {
@@ -55,7 +54,6 @@ class SensayService {
     };
   }
 
-  // parseRecommendationsFromResponse removed (not needed for string[])
 }
 
 export const sensayService = new SensayService();

@@ -1,25 +1,27 @@
-import { Router } from 'express';
-import { collections } from '../config/firebase.js';
-import { authenticateToken } from '../middleware/auth.js';
-const router = Router();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const firebase_1 = require("../config/firebase");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
 // POST /api/rsvp - RSVP to event
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', auth_1.authenticateToken, async (req, res) => {
     try {
         const { eventId, status } = req.body;
-        const userId = req.user.uid;
+        const userId = req.user.id;
         if (!eventId || !status) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
-        if (!['going', 'maybe', 'not_going'].includes(status)) {
+        if (!['yes', 'maybe', 'no'].includes(status)) {
             return res.status(400).json({ error: 'Invalid status' });
         }
         // Check if event exists
-        const eventDoc = await collections.events.doc(eventId).get();
+        const eventDoc = await firebase_1.collections.events.doc(eventId).get();
         if (!eventDoc.exists) {
             return res.status(404).json({ error: 'Event not found' });
         }
         // Check if RSVP already exists
-        const existingRsvpQuery = await collections.rsvps
+        const existingRsvpQuery = await firebase_1.collections.rsvps
             .where('userId', '==', userId)
             .where('eventId', '==', eventId)
             .get();
@@ -36,8 +38,6 @@ router.post('/', authenticateToken, async (req, res) => {
                 userId,
                 eventId,
                 status,
-                createdAt: updatedData.createdAt.toDate(),
-                updatedAt: new Date(),
             };
             return res.json(rsvp);
         }
@@ -46,10 +46,12 @@ router.post('/', authenticateToken, async (req, res) => {
             userId,
             eventId,
             status,
+        };
+        const docRef = await firebase_1.collections.rsvps.add({
+            ...rsvpData,
             createdAt: new Date(),
             updatedAt: new Date(),
-        };
-        const docRef = await collections.rsvps.add(rsvpData);
+        });
         const rsvp = { id: docRef.id, ...rsvpData };
         res.status(201).json(rsvp);
     }
@@ -62,7 +64,7 @@ router.post('/', authenticateToken, async (req, res) => {
 router.get('/event/:eventId', async (req, res) => {
     try {
         const { eventId } = req.params;
-        const snapshot = await collections.rsvps
+        const snapshot = await firebase_1.collections.rsvps
             .where('eventId', '==', eventId)
             .get();
         const rsvps = [];
@@ -70,9 +72,9 @@ router.get('/event/:eventId', async (req, res) => {
             const data = doc.data();
             rsvps.push({
                 id: doc.id,
-                ...data,
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
+                userId: data.userId,
+                eventId: data.eventId,
+                status: data.status,
             });
         });
         res.json(rsvps);
@@ -86,7 +88,7 @@ router.get('/event/:eventId', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
-        const snapshot = await collections.rsvps
+        const snapshot = await firebase_1.collections.rsvps
             .where('userId', '==', userId)
             .get();
         const rsvps = [];
@@ -94,9 +96,9 @@ router.get('/user/:userId', async (req, res) => {
             const data = doc.data();
             rsvps.push({
                 id: doc.id,
-                ...data,
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
+                userId: data.userId,
+                eventId: data.eventId,
+                status: data.status,
             });
         });
         res.json(rsvps);
@@ -106,5 +108,5 @@ router.get('/user/:userId', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch user RSVPs' });
     }
 });
-export default router;
+exports.default = router;
 //# sourceMappingURL=rsvp.js.map

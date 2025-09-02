@@ -1,8 +1,6 @@
 import { collections } from '../config/firebase';
 
 export async function createMeeting({ userId, participants, summary, description, start, end, meetingLink }: any) {
-  // TODO: Use OAuth2 tokens for the user
-  // For demo, just store meeting in Firestore
   const meetingData = {
     userId,
     participants,

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, Sparkles, X } from 'lucide-react';
+import ApiService, { SensayChatRequest } from '../../services/api';
 
 interface Message {
   id: string;
@@ -57,16 +58,28 @@ const AIChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
 
-    // Simulate AI response
-    const responses = [
-      "I found 3 potential matches for you! Would you like to see their profiles?",
-      "Based on your interests, I recommend connecting with Sarah from TechCorp. She's also interested in AI and blockchain.",
-      "Great! I've scheduled a coffee chat for tomorrow at 2 PM. You'll receive a calendar invite shortly.",
-      "I've analyzed your networking goals. Here are some personalized recommendations for the conference."
-    ];
-
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    await simulateTyping(randomResponse);
+    setIsTyping(true);
+    try {
+      // Call Sensay API
+  // Always send { prompt: ... } for backend compatibility
+  const chatRequest: SensayChatRequest = { prompt: userMessage.text };
+  const response = await ApiService.chatWithAI(chatRequest);
+      setIsTyping(false);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: response.response || 'Sorry, I could not process your request.',
+        isUser: false,
+        timestamp: new Date()
+      }]);
+    } catch (err) {
+      setIsTyping(false);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: 'Sorry, there was an error connecting to the AI.',
+        isUser: false,
+        timestamp: new Date()
+      }]);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

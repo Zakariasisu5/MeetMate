@@ -34,8 +34,4 @@ export interface User {
     name: string;
     email: string;
 }
-export type { User };
-export type { Event };
-export type { AIRequest };
-export type { AIResponse };
 //# sourceMappingURL=index.d.ts.map

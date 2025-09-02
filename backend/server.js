@@ -12,17 +12,23 @@ setupSocket(server);
 
 // CORS: allow frontend origin in production
 const allowedOrigins = [
-	process.env.FRONTEND_URL || 'http://localhost:5173',
-	'https://meet-mate-ten.vercel.app', // Vercel production frontend
+	process.env.FRONTEND_URL || 'http://localhost:3000',
+	'http://localhost:5173', // Vite default
+	'https://meetmate-zeta.vercel.app', // Vercel production frontend
 ];
 app.use(cors({
 	origin: function (origin, callback) {
+		console.log('CORS request from origin:', origin);
 		// allow requests with no origin (like mobile apps, curl, etc.)
 		if (!origin) return callback(null, true);
-		if (allowedOrigins.indexOf(origin) !== -1) {
+		// Allow exact match or subdomains of Vercel
+		if (
+			allowedOrigins.includes(origin) ||
+			/^https:\/\/meetmate-zeta(-[a-z0-9]+)?\.vercel\.app$/.test(origin)
+		) {
 			return callback(null, true);
 		} else {
-			return callback(new Error('Not allowed by CORS'));
+			return callback(new Error('Not allowed by CORS: ' + origin));
 		}
 	},
 	credentials: true,

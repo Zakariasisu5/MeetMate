@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { FaHome } from "react-icons/fa";
 import { 
   Users, 
   Sparkles, 
@@ -130,6 +131,7 @@ const Home = () => {
                 size="lg"
                 className="text-lg px-10 py-5"
               >
+                <FaHome />
                 <span>Get Started</span>
                 
               </NeonButton>

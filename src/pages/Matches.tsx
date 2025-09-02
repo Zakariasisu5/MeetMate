@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 
 import toast from 'react-hot-toast'
-import ApiService from '../services/api'
+import ApiService, { sendConnectionRequest } from '../services/api'
 import { useFirebaseAuth } from '../hooks/useFirebaseAuth'
 
 interface Match {
@@ -172,7 +172,7 @@ const Matches = () => {
       return;
     }
     try {
-      await ApiService.sendConnectionRequest(user.uid, matchId);
+  await sendConnectionRequest(user.uid, matchId);
       setMatches(matches => matches.map(match =>
         match.id === matchId
           ? { ...match, isPending: true }

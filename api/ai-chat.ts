@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!msg) {
         return res.status(400).json({ error: 'Message is required' });
       }
-      const response = await sensayService.chat({ message: msg, context });
+      const response = await sensayService.chat({ message: msg });
       res.json({ response: response.reply });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to connect to Sensay AI.', details: err.message });

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import AIChatbot from '../components/ui/AIChatbot'
 import { 
@@ -37,36 +37,51 @@ const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('week')
   const [selectedMetric, setSelectedMetric] = useState('all')
 
+  // --- LocalStorage Dashboard Stats ---
+  const [stats, setStats] = useState(() => {
+    const saved = localStorage.getItem('stats-dashboard');
+    return saved ? JSON.parse(saved) : {
+      matches: 47,
+      meetings: 23,
+      connections: 34,
+      responseRate: 78
+    };
+  });
+  useEffect(() => {
+    const saved = localStorage.getItem('stats-dashboard');
+    if (saved) setStats(JSON.parse(saved));
+  }, []);
+
   const metrics: Metric[] = [
     {
       label: 'Total Matches',
-      value: '47',
+      value: String(stats.matches ?? 47),
       change: '+12%',
       changeType: 'positive',
       icon: Users
     },
     {
       label: 'Scheduled Meetings',
-      value: '23',
+      value: String(stats.meetings ?? 23),
       change: '+8%',
       changeType: 'positive',
       icon: Calendar
     },
     {
       label: 'Active Connections',
-      value: '34',
+      value: String(stats.connections ?? 34),
       change: '+15%',
       changeType: 'positive',
       icon: Heart
     },
     {
       label: 'Response Rate',
-      value: '78%',
+      value: (stats.responseRate ?? 78) + '%',
       change: '+5%',
       changeType: 'positive',
       icon: MessageCircle
     }
-  ]
+  ];
 
   const chartData: ChartData[] = [
     { name: 'Mon', matches: 8, meetings: 4, connections: 6 },

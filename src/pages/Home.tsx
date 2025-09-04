@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { FaHome } from "react-icons/fa";
+
 import { 
   Users, 
   Sparkles, 
@@ -32,6 +32,7 @@ const Home = () => {
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [successType, setSuccessType] = useState<string | null>(null);
 
   const features = [
     {
@@ -45,14 +46,14 @@ const Home = () => {
       description: 'Automatically schedule coffee chats and meetings with your matches during the conference.'
     },
     {
-      icon: Shield,
-      title: 'Web3 Security',
-      description: 'Secure wallet-based authentication and decentralized profile storage for privacy and control.'
+      icon: Award,
+      title: 'Gamified Networking',
+      description: 'Earn badges and rewards for making connections, attending events, and engaging.'
     },
     {
       icon: Zap,
       title: 'Instant Connections',
-      description: 'Real-time notifications and instant messaging to keep conversations flowing.'
+      description: 'Real-time notifications and instant messaging to keep conversations  flowing.'
     }
   ];
 
@@ -74,7 +75,8 @@ const Home = () => {
       interests: ['AI/ML', 'Blockchain', 'Web3', 'Startups'],
       rating: 4.8,
       isOnline: true,
-      lastActive: '2 min ago'
+      lastActive: '2 min ago',
+      avatar: 'https://ui-avatars.com/api/?name=Sarah+Chen'
     },
     {
       id: '2',
@@ -86,9 +88,28 @@ const Home = () => {
       interests: ['Fintech', 'Product Strategy', 'UX Design', 'Innovation'],
       rating: 4.9,
       isOnline: false,
-      lastActive: '1 hour ago'
+      lastActive: '1 hour ago',
+      avatar: 'https://ui-avatars.com/api/?name=Alex+Rodriguez'
     }
   ];
+
+  const [connections, setConnections] = useState(() => {
+    const saved = localStorage.getItem('connections');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingUser, setPendingUser] = useState<any>(null);
+
+  useEffect(() => {
+    localStorage.setItem('connections', JSON.stringify(connections));
+  }, [connections]);
+
+  // Dashboard stat update (example: update connections count)
+  useEffect(() => {
+    const stats = JSON.parse(localStorage.getItem('stats-dashboard') || '{}');
+    stats.connections = Object.values(connections).filter((s: any) => s === 'connected').length;
+    localStorage.setItem('stats-dashboard', JSON.stringify(stats));
+  }, [connections]);
 
   const { user, userProfile } = useFirebaseAuth();
   const isProfileComplete = userProfile && userProfile.name && userProfile.bio && userProfile.avatar;
@@ -131,7 +152,6 @@ const Home = () => {
                 size="lg"
                 className="text-lg px-10 py-5"
               >
-                <FaHome />
                 <span>Get Started</span>
                 
               </NeonButton>
@@ -265,30 +285,25 @@ const Home = () => {
                 viewport={{ once: true }}
               >
                 <ProfileCard
-                  user={user}
+                  user={{
+                    id: user.id,
+                    name: user.name,
+                    avatar: user.avatar || `https://ui-avatars.com/api/?name=${user.name}`,
+                    role: user.role,
+                    company: user.company,
+                    location: user.location,
+                    bio: user.bio,
+                    interests: user.interests,
+                    rating: user.rating,
+                    isOnline: user.isOnline,
+                    lastActive: user.lastActive
+                  }}
+                  connectStatus={connections[user.id] || 'default'}
                   onConnect={() => {
-                    if (!user) {
-                      alert('You must be logged in to connect. Please log in or complete your profile.');
-                      return;
-                    }
-                    if (!isProfileComplete) {
-                      alert('Please complete your profile before connecting with others.');
-                      return;
-                    }
-                    localStorage.setItem('receiverId', user.id);
-                    setSelectedUser(user);
-                    setShowConnectModal(true);
+                    setPendingUser(user);
+                    setShowConfirm(true);
                   }}
                   onMessage={() => {
-                    if (!user) {
-                      alert('You must be logged in to message. Please log in or complete your profile.');
-                      return;
-                    }
-                    if (!isProfileComplete) {
-                      alert('Please complete your profile before messaging others.');
-                      return;
-                    }
-                    localStorage.setItem('receiverId', user.id);
                     setSelectedUser(user);
                     setShowMessageModal(true);
                   }}
@@ -297,6 +312,18 @@ const Home = () => {
                     setShowCalendarModal(true);
                   }}
                 />
+                  {/* Success Toast/Popup */}
+                  {successType && (
+                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[100]">
+                      <div className="bg-gradient-to-br from-green-400/90 to-blue-500/90 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center space-x-3 animate-bounce backdrop-blur-xl border border-white/20">
+                        <span className="text-lg font-bold">
+                          {successType === 'connect' && 'Connection request sent!'}
+                          {successType === 'message' && 'Message sent!'}
+                          {successType === 'schedule' && 'Meeting scheduled!'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
               </motion.div>
             ))}
           </div>
@@ -337,16 +364,36 @@ const Home = () => {
         </section>
       </div>
 
-      {/* Modals */}
-      {showConnectModal && selectedUser && (
-        <ConnectModal
-          user={selectedUser}
-          onClose={() => setShowConnectModal(false)}
-          onSendRequest={() => {
-            setShowConnectModal(false);
-            alert(`Connection request sent to ${selectedUser.name}`);
-          }}
-        />
+      {/* Confirmation Modal for Connect */}
+      {showConfirm && pendingUser && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-md">
+          <div className="bg-black rounded-2xl shadow-2xl p-8 w-full max-w-md border border-primary/20 relative flex flex-col items-center">
+            <h2 className="text-2xl font-bold mb-4 text-center">Do you want to connect with {pendingUser.name}?</h2>
+            <div className="flex space-x-4 mt-4">
+              <button
+                className="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary/80"
+                onClick={() => {
+                  setConnections((prev: any) => {
+                    const updated = { ...prev, [pendingUser.id]: 'pending' };
+                    localStorage.setItem('connections', JSON.stringify(updated));
+                    // Simulate acceptance after 3s
+                    setTimeout(() => {
+                      const accepted = { ...JSON.parse(localStorage.getItem('connections') || '{}'), [pendingUser.id]: 'connected' };
+                      setConnections(accepted);
+                      localStorage.setItem('connections', JSON.stringify(accepted));
+                    }, 3000);
+                    return updated;
+                  });
+                  setShowConfirm(false);
+                }}
+              >Confirm</button>
+              <button
+                className="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
+                onClick={() => setShowConfirm(false)}
+              >Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
       {showMessageModal && selectedUser && (
         <MessageModal

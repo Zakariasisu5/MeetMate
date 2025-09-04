@@ -1,451 +1,334 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import ApiService from '../services/api'
-import AIChatbot from '../components/ui/AIChatbot'
-import { 
-  User, 
-  Briefcase, 
-  Target, 
-  Globe, 
-  Mail, 
-  Linkedin,
-  Twitter,
-  Github,
-  Save,
-  Sparkles,
-  CheckCircle,
-  Plus,
-  X
-} from 'lucide-react'
-import toast from 'react-hot-toast'
+import React, { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { Linkedin, Github, Globe, Mail } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  title: z.string().min(2, 'Title must be at least 2 characters'),
-  company: z.string().min(2, 'Company must be at least 2 characters'),
-  bio: z.string().min(10, 'Bio must be at least 10 characters'),
-  email: z.string().email('Invalid email address'),
-  linkedin: z.string().url('Invalid LinkedIn URL').optional().or(z.literal('')),
-  twitter: z.string().url('Invalid Twitter URL').optional().or(z.literal('')),
-  github: z.string().url('Invalid GitHub URL').optional().or(z.literal('')),
-  location: z.string().min(2, 'Location must be at least 2 characters'),
-  goals: z.array(z.string()).min(1, 'At least one goal is required'),
-  interests: z.array(z.string()).min(1, 'At least one interest is required'),
-})
-
-type ProfileFormData = z.infer<typeof profileSchema>
-
-interface InterestItemProps {
-  interest: string;
-  onRemove: (interest: string) => void;
+type ProfileFormData = {
+  name: string
+  bio: string
+  location: string
+  website: string
+  email: string
+  linkedin: string
+  github: string
 }
 
-const InterestItem: React.FC<InterestItemProps> = ({ interest, onRemove }) => (
-  <div className="flex items-center space-x-2">
-    <CheckCircle className="h-4 w-4 text-primary" />
-    <span className="flex-1">{interest}</span>
-    <button
-      type="button"
-      onClick={() => onRemove(interest)}
-      className="text-muted-foreground hover:text-destructive"
-    >
-      <X className="h-4 w-4" />
-    </button>
-  </div>
-);
+const Profile: React.FC = () => {
+  const { register, handleSubmit, reset } = useForm<ProfileFormData>()
+  const [savedProfile, setSavedProfile] = useState<ProfileFormData | null>(null)
+  const [avatar, setAvatar] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [skills, setSkills] = useState<string[]>([])
+  const [skillInput, setSkillInput] = useState("")
+  const [isEditing, setIsEditing] = useState(true)
 
-const Profile = () => {
-  const [skills, setSkills] = useState<string[]>(['React', 'TypeScript', 'Web3'])
-  const [newSkill, setNewSkill] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    setValue,
-    watch,
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: '',
-      title: '',
-      company: '',
-      bio: '',
-      email: '',
-      linkedin: '',
-      twitter: '',
-      github: '',
-      location: '',
-      goals: ['Build meaningful connections', 'Learn from industry experts'],
-      interests: ['DeFi', 'Product Design', 'AI/ML'],
-    },
-  })
-
-  const watchedGoals = watch('goals') || []
-  const watchedInterests = watch('interests') || []
-
-  const addSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()])
-      setNewSkill('')
+  // ✅ Load saved profile from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("userProfile")
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      setSavedProfile(parsed)
+      if (parsed.avatar) setAvatar(parsed.avatar)
+      if (parsed.skills) setSkills(parsed.skills)
+      reset(parsed)
+      setIsEditing(false)
     }
-  }
+  }, [reset])
 
-  const removeSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove))
-  }
-
-  const addGoal = () => {
-    const newGoal = prompt('Enter a new goal:')
-    if (newGoal?.trim()) {
-      setValue('goals', [...watchedGoals, newGoal.trim()])
-    }
-  }
-
-  const removeGoal = (goalToRemove: string) => {
-    setValue('goals', watchedGoals.filter((goal: string) => goal !== goalToRemove))
-  }
-
-  const addInterest = () => {
-    const newInterest = prompt('Enter a new interest:')
-    if (newInterest?.trim()) {
-      setValue('interests', [...watchedInterests, newInterest.trim()])
-    }
-  }
-
-  const removeInterest = (interestToRemove: string) => {
-    setValue('interests', watchedInterests.filter((interest: string) => interest !== interestToRemove))
-  }
-
-  const onSubmit = async (data: ProfileFormData) => {
-    try {
-      // Check Firebase auth state before saving
-      const { auth } = await import('../config/firebase');
-      const user = auth.currentUser;
-      console.log('Auth user:', user);
-      if (!user) {
-        toast.error('You must login before completing your profile');
-        throw new Error('Please login first');
+  // ✅ Handle avatar upload and persist as Base64
+  const handleAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setPreview(base64String)
+        setAvatar(base64String)
       }
-      // Save profile to backend
-      const payload = {
-        name: data.name,
-        title: data.title,
-        company: data.company,
-        bio: data.bio,
-        email: data.email,
-        linkedin: data.linkedin,
-        twitter: data.twitter,
-        github: data.github,
-        location: data.location,
-        skills: skills,
-        goals: data.goals,
-        interests: data.interests,
-      };
-      // Save and get response
-      const savedProfile = await ApiService.createUser(payload);
-      // Store senderId and full profile in localStorage for connection system
-      if (savedProfile && savedProfile.id) {
-        localStorage.setItem('senderId', savedProfile.id);
-        localStorage.setItem('userProfile', JSON.stringify(savedProfile));
-      }
-      toast.success('Profile saved successfully!');
-      setIsEditing(false);
-      // Show saved data to user
-      toast('Profile saved locally!', { icon: '💾', duration: 4000 });
-    } catch (error) {
-      toast.error('Failed to save profile');
-      console.error('Error saving profile:', error);
+      reader.readAsDataURL(file)
     }
+  }
+
+  // ✅ Add skills
+  const handleAddSkill = () => {
+    if (skillInput.trim()) {
+      setSkills((prev) => [...prev, skillInput.trim()])
+      setSkillInput("")
+    }
+  }
+
+  // ✅ Save profile
+  const onSubmit = (data: ProfileFormData) => {
+    const profileData = { ...data, avatar: avatar || preview, skills }
+    localStorage.setItem("userProfile", JSON.stringify(profileData))
+    setSavedProfile(profileData)
+    setAvatar(profileData.avatar || null)
+    setIsEditing(false)
   }
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-y-24">
-      {/* Header */}
-      <section className="py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-4"
-        >
-          <div className="flex items-center justify-center space-x-2">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Smart Profile
-            </h1>
-          </div>
-          <p className="text-lg text-muted-foreground">
-            Create your profile to enable AI-powered matchmaking at conferences
-          </p>
-        </motion.div>
-      </section>
-
-      {/* Profile Form */}
-      <section className="py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Basic Information */}
-            <div className="card space-y-6">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">Basic Information</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Full Name *
-                </label>
+    <div className="p-6 max-w-lg mx-auto">
+      <AnimatePresence mode="wait">
+        {isEditing ? (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto max-h-[80vh] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+          >
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
+              Edit Profile
+            </h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 text-black">
+              {/* Avatar Upload */}
+              <div className="flex flex-col items-center">
                 <input
-                  {...register('name')}
-                  className="input"
-                  placeholder="John Doe"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatar}
+                  className="hidden"
+                  id="avatarUpload"
                 />
-                {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Professional Title *
-                </label>
-                <input
-                  {...register('title')}
-                  className="input"
-                  placeholder="Senior Developer"
-                />
-                {errors.title && (
-                  <p className="text-sm text-destructive">{errors.title.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Company *
-                </label>
-                <input
-                  {...register('company')}
-                  className="input"
-                  placeholder="Tech Corp"
-                />
-                {errors.company && (
-                  <p className="text-sm text-destructive">{errors.company.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Location *
-                </label>
-                <input
-                  {...register('location')}
-                  className="input"
-                  placeholder="San Francisco, CA"
-                />
-                {errors.location && (
-                  <p className="text-sm text-destructive">{errors.location.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Bio *
-              </label>
-              <textarea
-                {...register('bio')}
-                className="input min-h-[100px] resize-none"
-                placeholder="Tell us about yourself, your experience, and what you're looking for..."
-              />
-              {errors.bio && (
-                <p className="text-sm text-destructive">{errors.bio.message}</p>
-                )}
-            </div>
-          </div>
-
-          {/* Skills */}
-          <div className="card space-y-6">
-            <div className="flex items-center space-x-2">
-              <Briefcase className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Skills & Expertise</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  className="input flex-1"
-                  placeholder="Add a skill (e.g., React, Product Management)"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                />
-                <button
-                  type="button"
-                  onClick={addSkill}
-                  className="btn-primary"
+                <label
+                  htmlFor="avatarUpload"
+                  className="cursor-pointer w-28 h-28 rounded-full overflow-hidden border-4 border-blue-500 flex items-center justify-center shadow-md hover:shadow-lg transition"
                 >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
-                  <div
-                    key={skill}
-                    className="flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1 rounded-2xl"
-                  >
-                    <span className="text-sm font-medium">{skill}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeSkill(skill)}
-                      className="text-primary hover:text-primary/80"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Goals */}
-          <div className="card space-y-6">
-            <div className="flex items-center space-x-2">
-              <Target className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Conference Goals</h2>
-            </div>
-            <div className="space-y-4">
-              <button
-                type="button"
-                onClick={addGoal}
-                className="btn-secondary"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Goal
-              </button>
-              <div className="space-y-2">
-                {watchedGoals.map((goal: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span className="flex-1">{goal}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeGoal(goal)}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="card space-y-6">
-            <div className="flex items-center space-x-2">
-              <Mail className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Contact Information</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Email *
+                  {preview || avatar ? (
+                    <motion.img
+                      key={preview || avatar}
+                      src={preview || avatar || ""}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4 }}
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-500">Upload</span>
+                  )}
                 </label>
+              </div>
+
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Full Name</label>
                 <input
-                  {...register('email')}
+                  {...register("name")}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Bio</label>
+                <textarea
+                  {...register("bio")}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Write something about yourself"
+                />
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Location</label>
+                <input
+                  {...register("location")}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Where are you from?"
+                />
+              </div>
+
+              {/* Website */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Website</label>
+                <input
+                  {...register("website")}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Email</label>
+                <input
+                  {...register("email")}
                   type="email"
-                  className="input"
-                  placeholder="john@example.com"
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="you@example.com"
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
-                )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  LinkedIn
-                </label>
+              {/* LinkedIn */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">LinkedIn</label>
                 <input
-                  {...register('linkedin')}
-                  className="input"
-                  placeholder="https://linkedin.com/in/johndoe"
+                  {...register("linkedin")}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://linkedin.com/in/username"
                 />
-                {errors.linkedin && (
-                  <p className="text-sm text-destructive">{errors.linkedin.message}</p>
-                )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Twitter
-                </label>
+              {/* GitHub */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">GitHub</label>
                 <input
-                  {...register('twitter')}
-                  className="input"
-                  placeholder="https://twitter.com/johndoe"
+                  {...register("github")}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://github.com/username"
                 />
-                {errors.twitter && (
-                  <p className="text-sm text-destructive">{errors.twitter.message}</p>
-                )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  GitHub
-                </label>
-                <input
-                  {...register('github')}
-                  className="input"
-                  placeholder="https://github.com/johndoe"
-                />
-                {errors.github && (
-                  <p className="text-sm text-destructive">{errors.github.message}</p>
-                )}
+              {/* Skills */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Skills</label>
+                <div className="flex space-x-2">
+                  <input
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    className="flex-1 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Add a skill"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddSkill}
+                    className="bg-blue-600 text-white px-4 rounded-lg hover:bg-blue-700"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {skills.map((skill, index) => (
+                    <motion.span
+                      key={index}
+                      className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm shadow"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {skill}
+                    </motion.span>
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
+              <motion.button
+                type="submit"
+                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Save Profile
+              </motion.button>
+            </form>
+          </motion.div>
+        ) : (
+          savedProfile && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.6 }}
+              className="bg-white shadow-2xl rounded-2xl p-6 text-center"
             >
-              <Save className="h-5 w-5" />
-              <span>{isSubmitting ? 'Saving...' : 'Save Profile'}</span>
-            </button>
-          </div>
-          </form>
-        </motion.div>
-      </section>
+              {avatar && (
+                <motion.img
+                  src={avatar}
+                  alt="Profile"
+                  className="w-28 h-28 mx-auto rounded-full object-cover border-4 border-blue-500 shadow-md"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                />
+              )}
+              <h2 className="text-2xl font-bold mt-4 text-blue-600">{savedProfile.name}</h2>
+              <p className="text-gray-600 mt-2">{savedProfile.bio}</p>
+              <p className="text-gray-500 mt-1">{savedProfile.location}</p>
 
-      {/* Web3 Integration Notice */}
-      <section className="py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="card bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20"
-        >
-          {/* You can add a notice or info here if needed */}
-        </motion.div>
-        <AIChatbot/>
-      </section>
+              {/* Social Links */}
+              <div className="flex justify-center gap-4 mt-4">
+                {savedProfile.website && (
+                  <motion.a
+                    href={savedProfile.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 hover:text-blue-800"
+                    title="Website"
+                    whileHover={{ scale: 1.2 }}
+                  >
+                    <Globe className="w-6 h-6" />
+                  </motion.a>
+                )}
+                {savedProfile.email && (
+                  <motion.a
+                    href={`mailto:${savedProfile.email}`}
+                    className="text-red-500 hover:text-red-700"
+                    title="Email"
+                    whileHover={{ scale: 1.2 }}
+                  >
+                    <Mail className="w-6 h-6" />
+                  </motion.a>
+                )}
+                {savedProfile.linkedin && (
+                  <motion.a
+                    href={savedProfile.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-700 hover:text-blue-900"
+                    title="LinkedIn"
+                    whileHover={{ scale: 1.2 }}
+                  >
+                    <Linkedin className="w-6 h-6" />
+                  </motion.a>
+                )}
+                {savedProfile.github && (
+                  <motion.a
+                    href={savedProfile.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-gray-800 hover:text-black"
+                    title="GitHub"
+                    whileHover={{ scale: 1.2 }}
+                  >
+                    <Github className="w-6 h-6" />
+                  </motion.a>
+                )}
+              </div>
+
+              {/* Skills */}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold">Skills</h3>
+                <div className="flex flex-wrap gap-2 mt-2 justify-center">
+                  {skills.map((skill, index) => (
+                    <motion.span
+                      key={index}
+                      className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm shadow"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {skill}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+
+              <motion.button
+                onClick={() => setIsEditing(true)}
+                className="mt-6 bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 font-semibold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Edit Profile
+              </motion.button>
+            </motion.div>
+          )
+        )}
+      </AnimatePresence>
     </div>
   )
 }

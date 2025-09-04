@@ -41,9 +41,11 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ user, onClose, onSendReques
       initial={{ opacity: 0, scale: 0.95 }} 
       animate={{ opacity: 1, scale: 1 }} 
       exit={{ opacity: 0, scale: 0.95 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900/60 via-purple-900/60 to-black/80 backdrop-blur-[6px]"
     >
-  <div className="bg-gradient-to-br from-primary/30 via-accent/20 to-background rounded-3xl shadow-2xl p-8 w-full max-w-md border border-primary/20 relative">
+      <div className="relative w-full max-w-md">
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/40 via-blue-200/30 to-purple-200/30 backdrop-blur-2xl shadow-2xl border border-white/20" style={{ filter: 'blur(0px)' }}></div>
+        <div className="relative z-10 bg-white/60 dark:bg-black/60 rounded-3xl p-8 flex flex-col items-center shadow-2xl backdrop-blur-xl">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-primary">
           <XCircle className="w-6 h-6" />
         </button>
@@ -69,9 +71,9 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ user, onClose, onSendReques
         )}
         {success ? (
           <div className="flex flex-col items-center space-y-2">
-            <CheckCircle className="w-10 h-10 text-green-500 mb-2" />
-            <span className="text-green-600 font-semibold">Request sent successfully!</span>
-            <button onClick={onClose} className="mt-4 px-6 py-2 rounded-xl bg-primary text-white font-semibold">Close</button>
+            <CheckCircle className="w-10 h-10 text-green-500 mb-2 animate-bounce" />
+            <span className="text-green-600 font-semibold text-lg">Request sent successfully!</span>
+            <button onClick={onClose} className="mt-4 px-6 py-2 rounded-xl bg-primary text-white font-semibold shadow-lg">Close</button>
           </div>
         ) : (
           <>
@@ -85,6 +87,7 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ user, onClose, onSendReques
             </div>
           </>
         )}
+        </div>
       </div>
     </motion.div>
   );

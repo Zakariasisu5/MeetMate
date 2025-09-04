@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AIChatbot from '../components/ui/AIChatbot'
 import { 
@@ -38,9 +38,6 @@ interface Match {
 }
 
 const Matches = () => {
-  const { user, userProfile } = useFirebaseAuth();
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedFilter, setSelectedFilter] = useState('all')
   const [matches, setMatches] = useState<Match[]>([
     {
       id: '1',
@@ -48,7 +45,7 @@ const Matches = () => {
       title: 'Product Designer',
       company: 'DeFi Labs',
       location: 'San Francisco, CA',
-  avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+      avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
       matchScore: 94,
       skills: ['Product Design', 'UX Research', 'Figma', 'DeFi'],
       interests: ['DeFi', 'Product Design', 'AI/ML'],
@@ -132,7 +129,9 @@ const Matches = () => {
       isConnected: false,
       isPending: false,
     },
-  ])
+  ]);
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const filters = [
     { id: 'all', label: 'All Matches', count: matches.length },
@@ -157,6 +156,29 @@ const Matches = () => {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
 
+  // Add connections state to track connection status for each match (persisted in localStorage)
+  const [connections, setConnections] = useState<{ [key: string]: 'default' | 'pending' | 'connected' }>(() => {
+    const saved = localStorage.getItem('connections');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingUser, setPendingUser] = useState<Match | null>(null);
+
+  // Persist connections to localStorage
+  useEffect(() => {
+    localStorage.setItem('connections', JSON.stringify(connections));
+  }, [connections]);
+
+  // Update dashboard stats
+  useEffect(() => {
+    const stats = JSON.parse(localStorage.getItem('stats-dashboard') || '{}');
+    stats.connections = Object.values(connections).filter((s: any) => s === 'connected').length;
+    localStorage.setItem('stats-dashboard', JSON.stringify(stats));
+  }, [connections]);
+
+  // Get user and userProfile from authentication hook
+  const { user, userProfile } = useFirebaseAuth();
+  
   const isProfileComplete = userProfile && userProfile.name && userProfile.bio && userProfile.avatar;
   const connectWithMatch = async (matchId: string) => {
     setLoadingId(matchId);
@@ -275,128 +297,141 @@ const Matches = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
       >
         <AnimatePresence>
-          {filteredMatches.map((match, index) => (
-            <motion.div
-              key={match.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="card space-y-4 p-4 sm:p-6"
-            >
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={match.avatar}
-                    alt={match.name}
-                    className="w-12 h-12 rounded-2xl object-cover"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-foreground">{match.name}</h3>
-                    <p className="text-sm text-muted-foreground">{match.title}</p>
-                  </div>
-                </div>
-                <div className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchScoreColor(match.matchScore)}`}>
-                  {match.matchScore}%
-                </div>
-              </div>
-
-              {/* Company and Location */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-muted-foreground gap-1 sm:gap-0">
-                <div className="flex items-center space-x-1">
-                  <Building className="h-4 w-4" />
-                  <span>{match.company}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{match.location}</span>
-                </div>
-              </div>
-
-              {/* Bio */}
-              <p className="text-sm text-muted-foreground line-clamp-3">
-                {match.bio}
-              </p>
-
-              {/* Skills */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground">Skills</h4>
-                <div className="flex flex-wrap gap-2">
-                  {match.skills.slice(0, 3).map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-xl"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                  {match.skills.length > 3 && (
-                    <span className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-xl">
-                      +{match.skills.length - 3} more
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Match Reasons */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground">Why you match</h4>
-                <div className="space-y-1">
-                  {match.interests.slice(0, 2).map((interest) => (
-                    <div key={interest} className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <CheckCircle className="h-3 w-3 text-primary" />
-                      <span>Both interested in {interest}</span>
+          {filteredMatches.map((match, index) => {
+            const connectState = connections[match.id] || 'default';
+            return (
+              <motion.div
+                key={match.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="card space-y-4 p-4 sm:p-6"
+              >
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={match.avatar}
+                      alt={match.name}
+                      className="w-12 h-12 rounded-2xl object-cover"
+                    />
+                    <div>
+                      <h3 className="font-semibold text-foreground">{match.name}</h3>
+                      <p className="text-sm text-muted-foreground">{match.title}</p>
                     </div>
-                  ))}
-                  {match.goals.slice(0, 1).map((goal) => (
-                    <div key={goal} className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <CheckCircle className="h-3 w-3 text-primary" />
-                      <span>Similar goal: {goal}</span>
-                    </div>
-                  ))}
+                  </div>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchScoreColor(match.matchScore)}`}>
+                    {match.matchScore}%
+                  </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                {match.isConnected ? (
-                  <div className="flex items-center space-x-2 text-sm text-green-600 bg-green-100 px-3 py-2 rounded-2xl w-full justify-center">
-                    <CheckCircle className="h-4 w-4" />
-                    <span>Connected</span>
+                {/* Company and Location */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-muted-foreground gap-1 sm:gap-0">
+                  <div className="flex items-center space-x-1">
+                    <Building className="h-4 w-4" />
+                    <span>{match.company}</span>
                   </div>
-                ) : match.isPending ? (
-                  <div className="flex items-center space-x-2 text-sm text-yellow-600 bg-yellow-100 px-3 py-2 rounded-2xl w-full justify-center">
-                    <Clock className="h-4 w-4" />
-                    <span>Pending</span>
+                  <div className="flex items-center space-x-1">
+                    <MapPin className="h-4 w-4" />
+                    <span>{match.location}</span>
                   </div>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => connectWithMatch(match.id)}
-                      disabled={loadingId === match.id}
-                      className={`btn-primary flex-1 flex items-center justify-center space-x-2 rounded-2xl px-4 py-2 font-semibold transition-all duration-200 ${loadingId === match.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      <Heart className="h-4 w-4" />
-                      <span>{loadingId === match.id ? 'Connecting...' : 'Connect'}</span>
-                    </button>
-                    <button
-                      onClick={() => messageMatch(match.id)}
-                      disabled={loadingId === match.id}
-                      className={`btn-secondary flex-1 flex items-center justify-center space-x-2 rounded-2xl px-4 py-2 font-semibold transition-all duration-200 ${loadingId === match.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{loadingId === match.id ? 'Sending...' : 'Message'}</span>
-                    </button>
-                    {errorId === match.id && (
-                      <div className="text-xs text-red-500 mt-2 w-full text-center">Action failed. Try again.</div>
+                </div>
+
+                {/* Bio */}
+                <p className="text-sm text-muted-foreground line-clamp-3">
+                  {match.bio}
+                </p>
+
+                {/* Skills */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {match.skills.slice(0, 3).map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-xl"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                    {match.skills.length > 3 && (
+                      <span className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-xl">
+                        +{match.skills.length - 3} more
+                      </span>
                     )}
-                  </>
-                )}
-              </div>
-            </motion.div>
-          ))}
+                  </div>
+                </div>
+
+                {/* Match Reasons */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">Why you match</h4>
+                  <div className="space-y-1">
+                    {match.interests.slice(0, 2).map((interest) => (
+                      <div key={interest} className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                        <span>Both interested in {interest}</span>
+                      </div>
+                    ))}
+                    {match.goals.slice(0, 1).map((goal) => (
+                      <div key={goal} className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                        <span>Similar goal: {goal}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                  <button
+                    className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200
+                      ${connectState === 'connected' ? 'bg-green-500 text-white' : connectState === 'pending' ? 'bg-yellow-400 text-white' : 'bg-primary text-white hover:bg-primary/80'}`}
+                    onClick={() => {
+                      setPendingUser(match);
+                      setShowConfirm(true);
+                    }}
+                    disabled={connectState === 'pending' || connectState === 'connected'}
+                  >
+                    {connectState === 'connected' ? 'Connected' : connectState === 'pending' ? 'Pending' : 'Connect'}
+                  </button>
+                  {/* ...other buttons (Message, Schedule) can go here ... */}
+                </div>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
+      {/* Confirmation Modal for Connect */}
+      {showConfirm && pendingUser && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-md">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md border border-primary/20 relative flex flex-col items-center">
+            <h2 className="text-2xl font-bold mb-4 text-center">Do you want to connect with {pendingUser.name}?</h2>
+            <div className="flex space-x-4 mt-4">
+              <button
+                className="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary/80"
+                onClick={() => {
+                  setConnections((prev: any) => {
+                    const updated = { ...prev, [pendingUser.id]: 'pending' };
+                    localStorage.setItem('connections', JSON.stringify(updated));
+                    // Simulate acceptance after 3s
+                    setTimeout(() => {
+                      const accepted = { ...JSON.parse(localStorage.getItem('connections') || '{}'), [pendingUser.id]: 'connected' };
+                      setConnections(accepted);
+                      localStorage.setItem('connections', JSON.stringify(accepted));
+                    }, 3000);
+                    return updated;
+                  });
+                  setShowConfirm(false);
+                }}
+              >Confirm</button>
+              <button
+                className="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
+                onClick={() => setShowConfirm(false)}
+              >Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       </motion.div>
 
       {/* Empty State */}
@@ -425,18 +460,14 @@ const Matches = () => {
         className="card bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20"
       >
         <div className="flex items-start space-x-3">
-          <Sparkles className="h-6 w-6 text-primary mt-1" />
+        
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground">AI Matchmaking Insights</h3>
             <p className="text-sm text-muted-foreground">
               Our AI analyzes your profile, skills, interests, and goals to find the most relevant connections. 
               Match scores are based on skill overlap, shared interests, and complementary goals.
             </p>
-            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-              <span>• 90%+ = Excellent match</span>
-              <span>• 80-89% = Very good match</span>
-              <span>• 70-79% = Good match</span>
-            </div>
+           
           </div>
         </div>
       </motion.div>

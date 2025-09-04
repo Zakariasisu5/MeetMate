@@ -18,12 +18,13 @@ interface ProfileCardProps {
     isOnline: boolean;
     lastActive: string;
   };
+  connectStatus?: 'default' | 'pending' | 'connected';
   onConnect?: () => void;
   onMessage?: () => void;
   onSchedule?: () => void;
 }
 
-const ProfileCard = ({ user, onConnect, onMessage, onSchedule }: ProfileCardProps) => {
+const ProfileCard = ({ user, connectStatus = 'default', onConnect, onMessage, onSchedule }: ProfileCardProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   const getStatusColor = (isOnline: boolean) => {
@@ -121,11 +122,22 @@ const ProfileCard = ({ user, onConnect, onMessage, onSchedule }: ProfileCardProp
       <div className="flex space-x-3">
         <motion.button
           onClick={onConnect}
-          className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-semibold text-sm hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all duration-300"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          disabled={connectStatus === 'pending' || connectStatus === 'connected'}
+          className={`flex-1 py-2 px-4 rounded-xl font-semibold text-sm transition-all duration-300
+            ${connectStatus === 'connected'
+              ? 'bg-green-500 text-white cursor-default'
+              : connectStatus === 'pending'
+                ? 'bg-yellow-400 text-white cursor-not-allowed animate-pulse'
+                : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]'}
+          `}
+          whileHover={connectStatus === 'default' ? { scale: 1.02 } : {}}
+          whileTap={connectStatus === 'default' ? { scale: 0.98 } : {}}
         >
-          Connect
+          {connectStatus === 'connected'
+            ? 'Connected'
+            : connectStatus === 'pending'
+              ? 'Pending...'
+              : 'Connect'}
         </motion.button>
         
         <motion.button

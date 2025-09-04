@@ -1,4 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import ConnectModal from './ConnectModal';
+import CalendarModal from './CalendarModal';
+import MessageModal from './MessageModal';
 import { motion } from 'framer-motion'
 import { MapPin, Briefcase, MessageCircle, Calendar, ExternalLink } from 'lucide-react'
 
@@ -15,12 +18,26 @@ interface ProfileCardProps {
     status: 'online' | 'offline' | 'busy'
     isVerified: boolean
   }
+  connectStatus?: 'default' | 'pending' | 'connected';
   onConnect?: () => void
   onSchedule?: () => void
+  onMessage?: () => void
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onConnect, onSchedule }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ profile, connectStatus = 'default', onConnect, onSchedule, onMessage }) => {
   const [showTooltip, setShowTooltip] = useState(false)
+  // Modal state
+  const [showConnect, setShowConnect] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  // Handlers
+  const handleConnect = () => {
+    if (connectStatus !== 'pending' && connectStatus !== 'connected' && onConnect) {
+      onConnect();
+    }
+  };
+  const handleSchedule = () => { if (onSchedule) onSchedule(); };
+  const handleMessage = () => { if (onMessage) onMessage(); };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -135,27 +152,62 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onConnect, onSchedul
         </div>
 
         {/* Action buttons */}
-        <div className="flex space-x-3">
-          <motion.button
-            onClick={onConnect}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex-1 bg-gradient-to-r from-primary to-accent text-white py-3 px-4 rounded-2xl font-medium hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 flex items-center justify-center space-x-3 group"
+        <div className="flex space-x-3 mt-4">
+          {/* Connect Button */}
+          <button
+            onClick={handleConnect}
+            disabled={connectStatus === 'pending' || connectStatus === 'connected'}
+            className={`flex-1 rounded-lg py-3 px-4 font-medium transition-all duration-300
+              ${connectStatus === 'connected'
+                ? 'bg-green-500 text-white'
+                : connectStatus === 'pending'
+                  ? 'bg-yellow-400 text-white cursor-not-allowed'
+                  : 'bg-gradient-to-r from-primary to-accent text-white hover:shadow-lg hover:from-primary/80'}
+            `}
           >
-            <MessageCircle className="w-4 h-4" />
-            <span>Connect</span>
-          </motion.button>
-          
-          <motion.button
-            onClick={onSchedule}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex-1 bg-gradient-to-r from-secondary/20 to-background/40 border border-border/30 text-foreground py-3 px-4 rounded-2xl font-medium hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 flex items-center justify-center space-x-3"
+            {connectStatus === 'connected'
+              ? 'Connected'
+              : connectStatus === 'pending'
+                ? 'Pending'
+                : 'Connect'}
+          </button>
+          {/* Schedule Button */}
+          <button
+            onClick={handleSchedule}
+            className="flex-1 rounded-lg py-3 px-4 font-medium bg-gradient-to-r from-secondary/20 to-background/40 border border-border/30 text-foreground hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
           >
-            <Calendar className="w-4 h-4" />
-            <span>Schedule</span>
-          </motion.button>
+            Schedule
+          </button>
+          {/* Message Button */}
+          <button
+            onClick={handleMessage}
+            className="flex-1 rounded-lg py-3 px-4 font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300"
+          >
+            Message
+          </button>
         </div>
+        {/* Modals */}
+        {showConnect && (
+          <ConnectModal
+            user={profile}
+            onClose={() => setShowConnect(false)}
+            onSendRequest={handleConnect}
+          />
+        )}
+        {showSchedule && (
+          <CalendarModal
+            user={profile}
+            onClose={() => setShowSchedule(false)}
+            onSchedule={() => setShowSchedule(false)}
+          />
+        )}
+        {showMessage && (
+          <MessageModal
+            user={profile}
+            onClose={() => setShowMessage(false)}
+            onSendMessage={() => {}}
+          />
+        )}
       </div>
 
       {/* Hover tooltip for status */}

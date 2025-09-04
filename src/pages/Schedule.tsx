@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import AIChatbot from '../components/ui/AIChatbot'
 import { 
@@ -35,44 +35,60 @@ interface Meeting {
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [showNewMeetingModal, setShowNewMeetingModal] = useState(false)
-  const [meetings, setMeetings] = useState<Meeting[]>([
-    {
-      id: '1',
-      title: 'Coffee Chat with Anna Chen',
-      type: 'coffee',
-      date: '2024-01-15',
-      time: '10:00',
-      duration: 30,
-      location: 'Conference Center Cafe',
-      attendees: ['Anna Chen', 'You'],
-      status: 'scheduled',
-      notes: 'Discuss DeFi product design collaboration opportunities'
-    },
-    {
-      id: '2',
-      title: 'Video Call with Marcus Rodriguez',
-      type: 'video',
-      date: '2024-01-15',
-      time: '14:00',
-      duration: 45,
-      location: 'Zoom',
-      attendees: ['Marcus Rodriguez', 'You'],
-      status: 'scheduled',
-      notes: 'Deep dive into smart contract development and DeFi protocols'
-    },
-    {
-      id: '3',
-      title: 'Networking Lunch with Sarah Kim',
-      type: 'in-person',
-      date: '2024-01-16',
-      time: '12:00',
-      duration: 60,
-      location: 'Downtown Restaurant',
-      attendees: ['Sarah Kim', 'You'],
-      status: 'scheduled',
-      notes: 'Discuss Web3 marketing strategies and community building'
-    }
-  ])
+  const [meetings, setMeetings] = useState<Meeting[]>(() => {
+    const saved = localStorage.getItem('meetings');
+    if (saved) return JSON.parse(saved);
+    return [
+      {
+        id: '1',
+        title: 'Coffee Chat with Anna Chen',
+        type: 'coffee',
+        date: '2024-01-15',
+        time: '10:00',
+        duration: 30,
+        location: 'Conference Center Cafe',
+        attendees: ['Anna Chen', 'You'],
+        status: 'scheduled',
+        notes: 'Discuss DeFi product design collaboration opportunities'
+      },
+      {
+        id: '2',
+        title: 'Video Call with Marcus Rodriguez',
+        type: 'video',
+        date: '2024-01-15',
+        time: '14:00',
+        duration: 45,
+        location: 'Zoom',
+        attendees: ['Marcus Rodriguez', 'You'],
+        status: 'scheduled',
+        notes: 'Deep dive into smart contract development and DeFi protocols'
+      },
+      {
+        id: '3',
+        title: 'Networking Lunch with Sarah Kim',
+        type: 'in-person',
+        date: '2024-01-16',
+        time: '12:00',
+        duration: 60,
+        location: 'Downtown Restaurant',
+        attendees: ['Sarah Kim', 'You'],
+        status: 'scheduled',
+        notes: 'Discuss Web3 marketing strategies and community building'
+      }
+    ];
+  });
+
+  // Persist meetings to localStorage
+  useEffect(() => {
+    localStorage.setItem('meetings', JSON.stringify(meetings));
+  }, [meetings]);
+
+  // Update dashboard stats in localStorage
+  useEffect(() => {
+    const stats = JSON.parse(localStorage.getItem('stats-dashboard') || '{}');
+    stats.meetings = meetings.filter((m: any) => m.status === 'scheduled').length;
+    localStorage.setItem('stats-dashboard', JSON.stringify(stats));
+  }, [meetings]);
 
   const [newMeeting, setNewMeeting] = useState({
     title: '',
@@ -143,7 +159,11 @@ const Schedule = () => {
       notes: newMeeting.notes
     }
 
-    setMeetings([...meetings, meeting])
+    setMeetings(prev => {
+      const updated = [...prev, meeting];
+      localStorage.setItem('meetings', JSON.stringify(updated));
+      return updated;
+    });
     setShowNewMeetingModal(false)
     setNewMeeting({
       title: '',
@@ -159,20 +179,28 @@ const Schedule = () => {
   }
 
   const cancelMeeting = (meetingId: string) => {
-    setMeetings(meetings.map(meeting => 
-      meeting.id === meetingId 
-        ? { ...meeting, status: 'cancelled' as const }
-        : meeting
-    ))
+    setMeetings(prev => {
+      const updated = prev.map(meeting => 
+        meeting.id === meetingId 
+          ? { ...meeting, status: 'cancelled' as const }
+          : meeting
+      );
+      localStorage.setItem('meetings', JSON.stringify(updated));
+      return updated;
+    });
     toast.success('Meeting cancelled')
   }
 
   const completeMeeting = (meetingId: string) => {
-    setMeetings(meetings.map(meeting => 
-      meeting.id === meetingId 
-        ? { ...meeting, status: 'completed' as const }
-        : meeting
-    ))
+    setMeetings(prev => {
+      const updated = prev.map(meeting => 
+        meeting.id === meetingId 
+          ? { ...meeting, status: 'completed' as const }
+          : meeting
+      );
+      localStorage.setItem('meetings', JSON.stringify(updated));
+      return updated;
+    });
     toast.success('Meeting marked as completed')
   }
 

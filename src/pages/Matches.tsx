@@ -402,36 +402,72 @@ const Matches = () => {
           })}
         </AnimatePresence>
       {/* Confirmation Modal for Connect */}
-      {showConfirm && pendingUser && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-md">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md border border-primary/20 relative flex flex-col items-center">
-            <h2 className="text-2xl font-bold mb-4 text-center">Do you want to connect with {pendingUser.name}?</h2>
-            <div className="flex space-x-4 mt-4">
-              <button
-                className="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary/80"
-                onClick={() => {
-                  setConnections((prev: any) => {
-                    const updated = { ...prev, [pendingUser.id]: 'pending' };
-                    localStorage.setItem('connections', JSON.stringify(updated));
-                    // Simulate acceptance after 3s
-                    setTimeout(() => {
-                      const accepted = { ...JSON.parse(localStorage.getItem('connections') || '{}'), [pendingUser.id]: 'connected' };
-                      setConnections(accepted);
-                      localStorage.setItem('connections', JSON.stringify(accepted));
-                    }, 3000);
-                    return updated;
-                  });
-                  setShowConfirm(false);
-                }}
-              >Confirm</button>
-              <button
-                className="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
-                onClick={() => setShowConfirm(false)}
-              >Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+    {showConfirm && pendingUser && (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+  >
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.9, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-primary/30 rounded-2xl shadow-2xl p-8 w-full max-w-md"
+    >
+      {/* Close Button */}
+      <button
+        onClick={() => setShowConfirm(false)}
+        className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
+      >
+        <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+      </button>
+
+      {/* Title */}
+      <h2 className="text-2xl font-bold text-center text-primary mb-4">
+        Connect Request
+      </h2>
+
+      {/* Content */}
+      <p className="text-center text-muted-foreground mb-6">
+        Do you want to connect with <span className="font-semibold text-blue-600">{pendingUser.name}</span>?
+      </p>
+
+      {/* Action Buttons */}
+      <div className="flex justify-center gap-4">
+        <button
+          className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:scale-105 transition transform shadow-lg hover:shadow-xl"
+          onClick={() => {
+            setConnections((prev: any) => {
+              const updated = { ...prev, [pendingUser.id]: 'pending' };
+              localStorage.setItem('connections', JSON.stringify(updated));
+              // Simulate acceptance after 3 minutes
+              setTimeout(() => {
+                const accepted = {
+                  ...JSON.parse(localStorage.getItem('connections') || '{}'),
+                  [pendingUser.id]: 'connected',
+                };
+                setConnections(accepted);
+                localStorage.setItem('connections', JSON.stringify(accepted));
+              }, 180000);
+              return updated;
+            });
+            setShowConfirm(false);
+          }}
+        >
+          ✅ Confirm
+        </button>
+        <button
+          className="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
+          onClick={() => setShowConfirm(false)}
+        >
+          ❌ Cancel
+        </button>
+      </div>
+    </motion.div>
+  </motion.div>
+)}
       </motion.div>
 
       {/* Empty State */}

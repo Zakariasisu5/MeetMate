@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, Sparkles, X } from 'lucide-react';
 import axios from 'axios';
 
+const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+
 interface Message {
   id: string;
   text: string;
@@ -10,7 +12,7 @@ interface Message {
   timestamp: Date;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://meetmate-yvp2.onrender.com';
 
 const AIChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,14 +53,22 @@ const AIChat: React.FC = () => {
 
     setIsTyping(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/ai/gpt5`, { prompt: userMessage.text });
+      // Use GitHub's search/issues API to answer user questions
+      const res = await axios.get(`https://api.github.com/search/issues?q=${encodeURIComponent(userMessage.text)}`, {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
       setIsTyping(false);
-      let cleanText = res.data.response || 'Sorry, I could not process your request.';
-      cleanText = cleanText
-        .replace(/^[#*\s]+/gm, '')
-        .replace(/[\*#]+/g, '')
-        .replace(/\n{2,}/g, '\n')
-        .trim();
+      let cleanText = 'No relevant results found.';
+      if (res.data && res.data.items && res.data.items.length > 0) {
+        cleanText = res.data.items.slice(0, 3).map((item: { title: any; html_url: any; body: string; }) => {
+        
+          let summary = item.body ? item.body.replace(/#[A-Za-z0-9_-]+/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').substring(0, 200) + '...' : 'No summary.';
+          return `Title: ${item.title}\nURL: ${item.html_url}\nSummary: ${summary}`;
+        }).join('\n\n');
+      }
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         text: cleanText,
@@ -69,7 +79,7 @@ const AIChat: React.FC = () => {
       setIsTyping(false);
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        text: 'Sorry, there was an error connecting to the AI.',
+        text: 'Sorry, there was an error connecting to the GitHub API.',
         isUser: false,
         timestamp: new Date()
       }]);
@@ -121,7 +131,9 @@ const AIChat: React.FC = () => {
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="fixed bottom-24 right-6 z-40 w-96 h-[520px] bg-gradient-to-br from-blue-700/80 via-purple-800/80 to-indigo-900/80 backdrop-blur-2xl rounded-3xl border border-white/30 shadow-2xl flex flex-col"
+            className="fixed bottom-24 right-6 z-40 w-96 h-[520px] bg-gradient-to-br from-blue-700/80 via-purple-800/80 to-indigo-900/80 backdrop-blur-2xl rounded-3xl border border-white/30 shadow-2xl flex flex-col
+            md:w-96 md:h-[520px] md:right-6 md:bottom-24
+            sm:w-[95vw] sm:h-[60vh] sm:right-2 sm:bottom-2 sm:rounded-2xl sm:border sm:border-white/30 sm:z-50"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/20 bg-gradient-to-r from-blue-600/60 to-purple-700/60 rounded-t-3xl">

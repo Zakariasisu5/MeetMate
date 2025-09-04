@@ -425,19 +425,19 @@ const Matches = () => {
       </button>
 
       {/* Title */}
-      <h2 className="text-2xl font-bold text-center text-primary mb-4">
+      <h2 className="text-2xl font-bold text-center text-primary mb-4 text-blue-600">
         Connect Request
       </h2>
 
       {/* Content */}
-      <p className="text-center text-muted-foreground mb-6">
+      <p className="text-center text-muted-foreground text-blue-600 mb-6">
         Do you want to connect with <span className="font-semibold text-blue-600">{pendingUser.name}</span>?
       </p>
 
       {/* Action Buttons */}
       <div className="flex justify-center gap-4">
         <button
-          className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:scale-105 transition transform shadow-lg hover:shadow-xl"
+          className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:scale-105 transition transform shadow-lg hover:shadow-xl text-blue-600"
           onClick={() => {
             setConnections((prev: any) => {
               const updated = { ...prev, [pendingUser.id]: 'pending' };

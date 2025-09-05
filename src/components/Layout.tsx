@@ -17,11 +17,13 @@ import { useFirebaseAuth } from '../hooks/useFirebaseAuth'
 import Logo from './Logo'
 import ThemeToggle from './ui/ThemeToggle'
 import Footer from './Footer'
-import AIChat from './AIChat'
+//import AIChat from './AIChat'
+import AIChatbot from './AIChatbot'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { user, userProfile, signOut } = useFirebaseAuth()
@@ -115,7 +117,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               {/* User Profile */}
               <div className="relative">
                 <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -126,9 +128,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   </span>
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Profile Dropdown Menu */}
                 <AnimatePresence>
-                  {isMenuOpen && (
+                  {isProfileMenuOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -139,7 +141,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                       <Link
                         to="/profile"
                         className="flex items-center space-x-3 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => setIsProfileMenuOpen(false)}
                       >
                         <User className="w-4 h-4" />
                         <span>Profile</span>
@@ -147,7 +149,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                       <Link
                         to="/dashboard"
                         className="flex items-center space-x-3 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => setIsProfileMenuOpen(false)}
                       >
                         <BarChart3 className="w-4 h-4" />
                         <span>Dashboard</span>
@@ -155,7 +157,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                       <Link
                         to="/settings"
                         className="flex items-center space-x-3 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => setIsProfileMenuOpen(false)}
                       >
                         <Settings className="w-4 h-4" />
                         <span>Settings</span>
@@ -232,7 +234,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
       <Footer />
-      <AIChat />
+      <AIChatbot />
+      {/*<AIChat />*/}
     </div>
   )
 }

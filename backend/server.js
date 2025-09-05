@@ -36,6 +36,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Sensay AI route
+const sensayRoute = require('./routes/sensay');
+app.use('/api/sensay', sensayRoute);
+
 // Health check for Render
 app.get('/', (req, res) => {
 	res.status(200).json({ status: 'ok', message: 'MeetMate backend running' });
@@ -44,6 +48,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/ai', require('./routes/gpt5'));
+app.use('/api/openai', require('./routes/openai'));
 app.use('/api/github', require('./routes/github'));
 app.use('/match', require('./routes/match'));
 app.use('/messages', require('./routes/messages'));

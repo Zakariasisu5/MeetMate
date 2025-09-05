@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, Sparkles, X } from 'lucide-react';
 import axios from 'axios';
 
-const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
-
 interface Message {
   id: string;
   text: string;
@@ -12,7 +10,7 @@ interface Message {
   timestamp: Date;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://meetmate-yvp2.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://meetmate-yvp2.onrender.com'; // Sensay API only
 
 const AIChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +25,7 @@ const AIChat: React.FC = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [qaHistory, setQaHistory] = useState<{ question: string; answer: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll chat to bottom when messages update
@@ -53,14 +52,14 @@ const AIChat: React.FC = () => {
 
     setIsTyping(true);
     try {
-      // Call backend proxy for GitHub search
-      const res = await axios.post(`${API_BASE_URL}/api/github/search`, {
+      // Call backend Sensay AI for answers about MeetMate
+      const res = await axios.post(`${API_BASE_URL}/api/sensay/ask`, {
         query: userMessage.text
       });
       setIsTyping(false);
       let cleanText = 'No relevant results found.';
-      if (res.data && res.data.items && res.data.items.length > 0) {
-        cleanText = res.data.items.map((item: { title: string; url: string; summary: string; }) => `Title: ${item.title}\nURL: ${item.url}\nSummary: ${item.summary}`).join('\n\n');
+      if (res.data && res.data.answer) {
+        cleanText = res.data.answer;
       }
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -68,6 +67,8 @@ const AIChat: React.FC = () => {
         isUser: false,
         timestamp: new Date()
       }]);
+      // Store Q&A in local state for quick access
+      setQaHistory(prev => [...prev, { question: userMessage.text, answer: cleanText }]);
     } catch (err) {
       setIsTyping(false);
       setMessages(prev => [...prev, {

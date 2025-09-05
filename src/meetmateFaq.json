@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What is MeetMate?",
+  "answer": "MeetMate is a modern, user-friendly platform designed to help you plan events, network, and connect with others. We make it easy to organize meetings, chat, and build meaningful relationships in a secure and welcoming environment."
+  },
+  {
+    "question": "How do I sign up for MeetMate?",
+  "answer": "To sign up for MeetMate, please click the 'Sign Up' button on our homepage. Enter your email, create a secure password, and follow the instructions to verify your account. We're excited to welcome you to our community!"
+  },
+  {
+    "question": "How do I log in to MeetMate?",
+  "answer": "To log in, simply use your registered email and password on the login page. For your convenience, you may also log in with Google or other supported providers if available. If you need any help, our support team is here for you."
+  },
+  {
+    "question": "How do I connect with other users?",
+  "answer": "To connect with other users, browse their profiles and click the 'Connect' button to send a friendly connection request. Once your request is accepted, you can start chatting and schedule meetings together. We encourage positive and respectful interactions."
+  },
+  {
+    "question": "How does scheduling work in MeetMate?",
+  "answer": "Scheduling on MeetMate is simple and flexible. You can propose meeting times, view your calendar, and accept or decline invitations. Our platform helps you manage all your events efficiently in one place. If you need assistance, we're happy to help!"
+  },
+  {
+    "question": "How do I send messages to other users?",
+  "answer": "To send messages, open a connection or event and use our chat feature for instant communication. You can also share files and links securely. We value respectful and constructive conversations among our users."
+  },
+  {
+    "question": "How do I save a profile?",
+  "answer": "If you wish to save a profile, simply click the 'Save' button on any user profile. This will bookmark it for easy access later, and your saved profiles will appear in your dashboard."
+  },
+  {
+    "question": "What does the dashboard show?",
+  "answer": "Your dashboard is your personal hub on MeetMate. It displays your connections, upcoming meetings, response rate, and recent activity, helping you stay organized and engaged."
+  },
+  {
+    "question": "How is my response rate calculated?",
+  "answer": "Your response rate reflects how quickly you reply to messages and meeting requests. A higher rate shows that you are active and engaged in the community. We appreciate your prompt and courteous responses!"
+  },
+  {
+    "question": "Is MeetMate secure?",
+  "answer": "Absolutely! MeetMate uses advanced encryption and secure authentication to protect your data and privacy. Your safety and trust are our top priorities."
+  },
+  {
+    "question": "How do I edit my profile?",
+  "answer": "To edit your profile, go to your profile page and click 'Edit'. You can update your name, bio, photo, and other details to reflect your personality and preferences."
+  },
+  {
+    "question": "How do I reset my password?",
+  "answer": "If you need to reset your password, click 'Forgot Password' on the login page and follow the instructions sent to your email. If you have any trouble, please reach out to our support team for assistance."
+  },
+  {
+    "question": "How do I delete my account?",
+  "answer": "To delete your account, go to Account Settings, scroll down, and click 'Delete Account'. Please confirm your choice to permanently remove your account. We're sorry to see you go and hope you'll return in the future."
+  },
+  {
+    "question": "Are there free and paid features?",
+  "answer": "MeetMate offers a free tier with essential features for everyone. Premium plans unlock advanced scheduling, analytics, and priority support. We strive to provide great value at every level."
+  },
+  {
+    "question": "How do I contact MeetMate support?",
+  "answer": "If you need help or have questions, please use the 'Contact Us' form in the app or email support@meetmate.com. Our friendly team will respond as soon as possible and is always happy to assist you."
+  },
+  {
+    "question": "What’s on the MeetMate roadmap?",
+  "answer": "Our roadmap includes exciting new features such as group events, AI-powered recommendations, and deeper integrations with calendar apps. We value your feedback and are committed to continuous improvement."
+  },
+  {
+    "question": "Can I use MeetMate on mobile?",
+  "answer": "Yes, MeetMate works great on mobile browsers, and we are developing a dedicated app for even better mobile experiences. Thank you for your interest!"
+  },
+  {
+    "question": "How do I manage notifications?",
+  "answer": "To manage notifications, go to Settings > Notifications and customize alerts for messages, meetings, and connections according to your preferences."
+  },
+  {
+    "question": "How do I report a problem or user?",
+  "answer": "If you encounter a problem or wish to report a user, please use the 'Report' button on any profile or event, or contact our support team directly. We take all reports seriously and aim to maintain a safe and respectful community."
+  },
+  {
+    "question": "Is my data private on MeetMate?",
+  "answer": "Your privacy is very important to us. Your data is private and only shared with connections you approve. MeetMate will never sell or share your personal information."
+  }
+  ,
+  { "question": "How do I change my email address?", "answer": "To change your email, go to Account Settings and select 'Change Email'. Enter your new email and follow the verification steps. If you need help, our support team is happy to assist you." },
+  { "question": "Can I block or mute users?", "answer": "Yes, you can block or mute users from their profile or chat window. This helps you control your experience and maintain a positive environment." },
+  { "question": "How do I customize my MeetMate profile?", "answer": "Visit your profile page and click 'Edit'. You can add a profile picture, update your bio, and share your interests to help others connect with you." },
+  { "question": "Does MeetMate support group chats?", "answer": "Group chat is coming soon! For now, you can chat one-on-one with your connections. Stay tuned for updates on group features." },
+  { "question": "How do I join an event on MeetMate?", "answer": "Browse available events and click 'Join'. You’ll receive updates and can interact with other attendees before, during, and after the event." },
+  { "question": "Can I create my own event?", "answer": "Absolutely! Click 'Create Event' in your dashboard, fill in the details, and invite connections. You’re in control of your event experience." },
+  { "question": "How do I invite people to my event?", "answer": "When creating or viewing an event, use the 'Invite' button to send invitations to your connections. You can also share a link for others to join." },
+  { "question": "What types of events can I create?", "answer": "MeetMate supports all kinds of events: meetings, workshops, social gatherings, and more. Choose the type that fits your needs and customize it as you wish." },
+  { "question": "How do I cancel or reschedule an event?", "answer": "Go to your event page and select 'Cancel' or 'Reschedule'. Notify attendees with a message so everyone stays informed. We appreciate your courtesy!" },
+  { "question": "Can I sync MeetMate with my calendar?", "answer": "Yes, MeetMate supports calendar sync with Google Calendar and other providers. Go to Settings > Integrations to set it up." },
+  { "question": "How do I get reminders for meetings?", "answer": "Enable notifications in Settings to receive reminders for upcoming meetings and events. You can customize how and when you’re notified." },
+  { "question": "Is there a limit to the number of connections I can have?", "answer": "No, you can connect with as many users as you like. We encourage you to build a vibrant network!" },
+  { "question": "How do I search for users or events?", "answer": "Use the search bar at the top of your dashboard to find users, events, or topics. Filters help you narrow down your results." },
+  { "question": "Can I share files in MeetMate chat?", "answer": "Yes, you can securely share files and links in chat. Please ensure all shared content is appropriate and respectful." },
+  { "question": "How do I update my notification preferences?", "answer": "Go to Settings > Notifications to adjust your preferences for messages, events, and other alerts." },
+  { "question": "What happens if I forget my username?", "answer": "Your username is usually your email. If you need help, contact support and we’ll help you recover your account." },
+  { "question": "How do I report technical issues?", "answer": "If you encounter a bug or issue, please use the 'Report a Problem' feature in the app or email support@meetmate.com. We appreciate your feedback!" },
+  { "question": "Can I use MeetMate internationally?", "answer": "Yes, MeetMate is available worldwide. Connect and collaborate with users from different countries and cultures." },
+  { "question": "Is MeetMate suitable for business networking?", "answer": "Definitely! MeetMate is designed for both personal and professional networking. Use it to grow your business contacts and opportunities." },
+  { "question": "How do I access MeetMate on different devices?", "answer": "MeetMate works on desktops, laptops, tablets, and mobile browsers. A dedicated mobile app is coming soon!" },
+  { "question": "Can I customize event privacy settings?", "answer": "Yes, when creating or editing an event, you can choose privacy options to control who can see and join your event." },
+  { "question": "How do I leave feedback for MeetMate?", "answer": "We love hearing from you! Use the 'Feedback' form in the app or email us directly. Your suggestions help us improve." },
+  { "question": "What languages does MeetMate support?", "answer": "Currently, MeetMate is available in English. We plan to add more languages soon to serve our global community." },
+  { "question": "How do I enable dark mode?", "answer": "Go to Settings > Appearance and select 'Dark Mode' for a comfortable viewing experience." },
+  { "question": "Can I recover deleted messages?", "answer": "Deleted messages cannot be recovered for privacy reasons. Please be careful before deleting important information." },
+  { "question": "How do I manage my subscription?", "answer": "Go to Account Settings > Subscription to view, upgrade, or cancel your plan. Our support team can help with any questions." },
+  { "question": "Does MeetMate offer analytics?", "answer": "Premium users have access to advanced analytics for events, connections, and engagement. Upgrade to unlock these insights!" },
+  { "question": "How do I get help with onboarding?", "answer": "Our onboarding guide is available in the Help section. You can also chat with support for personalized assistance." },
+  { "question": "Can I use MeetMate for virtual events?", "answer": "Yes, MeetMate supports virtual events with integrated chat and scheduling. Host or join online meetings with ease." },
+  { "question": "How do I set my availability?", "answer": "Go to your profile or calendar and set your available times. This helps others schedule meetings that work for you." },
+  { "question": "Is there a referral program?", "answer": "Yes! Invite friends to MeetMate and earn rewards. Details are available in your dashboard under 'Referral Program'." }
+]

@@ -13,6 +13,7 @@ setupSocket(server);
 // CORS: allow frontend origin in production
 const allowedOrigins = [
 	process.env.FRONTEND_URL || 'http://localhost:3000',
+	'http://localhost:3000',
 	'http://localhost:5173', // Vite default
 	'https://meetmate-zeta.vercel.app', // Vercel production frontend
 ];
@@ -43,6 +44,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/ai', require('./routes/gpt5'));
+app.use('/api/github', require('./routes/github'));
 app.use('/match', require('./routes/match'));
 app.use('/messages', require('./routes/messages'));
 

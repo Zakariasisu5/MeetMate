@@ -53,21 +53,14 @@ const AIChat: React.FC = () => {
 
     setIsTyping(true);
     try {
-      // Use GitHub's search/issues API to answer user questions
-      const res = await axios.get(`https://api.github.com/search/issues?q=${encodeURIComponent(userMessage.text)}`, {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
+      // Call backend proxy for GitHub search
+      const res = await axios.post(`${API_BASE_URL}/api/github/search`, {
+        query: userMessage.text
       });
       setIsTyping(false);
       let cleanText = 'No relevant results found.';
       if (res.data && res.data.items && res.data.items.length > 0) {
-        cleanText = res.data.items.slice(0, 3).map((item: { title: any; html_url: any; body: string; }) => {
-        
-          let summary = item.body ? item.body.replace(/#[A-Za-z0-9_-]+/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').substring(0, 200) + '...' : 'No summary.';
-          return `Title: ${item.title}\nURL: ${item.html_url}\nSummary: ${summary}`;
-        }).join('\n\n');
+        cleanText = res.data.items.map((item: { title: string; url: string; summary: string; }) => `Title: ${item.title}\nURL: ${item.url}\nSummary: ${item.summary}`).join('\n\n');
       }
       setMessages(prev => [...prev, {
         id: Date.now().toString(),

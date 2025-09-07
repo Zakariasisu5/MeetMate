@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
+//import { useForm } from "react-hook-form"
 import { Linkedin, Github, Globe, Mail } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -334,3 +334,7 @@ const Profile: React.FC = () => {
 }
 
 export default Profile
+function useForm<T>(): { register: any; handleSubmit: any; reset: any } {
+  throw new Error("Function not implemented.")
+}
+

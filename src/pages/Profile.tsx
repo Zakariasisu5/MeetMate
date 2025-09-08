@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react"
-//import { useForm } from "react-hook-form"
+// import { useForm } from "react-hook-form"
 import { Linkedin, Github, Globe, Mail } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+
+// Simple local form state for Profile
+// Remove react-hook-form and use useState for form fields
 
 type ProfileFormData = {
   name: string
@@ -13,8 +16,18 @@ type ProfileFormData = {
   github: string
 }
 
+const defaultProfile: ProfileFormData = {
+  name: "",
+  bio: "",
+  location: "",
+  website: "",
+  email: "",
+  linkedin: "",
+  github: ""
+}
+
 const Profile: React.FC = () => {
-  const { register, handleSubmit, reset } = useForm<ProfileFormData>()
+  const [form, setForm] = useState<ProfileFormData>(defaultProfile)
   const [savedProfile, setSavedProfile] = useState<ProfileFormData | null>(null)
   const [avatar, setAvatar] = useState<string | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
@@ -22,20 +35,18 @@ const Profile: React.FC = () => {
   const [skillInput, setSkillInput] = useState("")
   const [isEditing, setIsEditing] = useState(true)
 
-  // ✅ Load saved profile from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("userProfile")
     if (stored) {
       const parsed = JSON.parse(stored)
       setSavedProfile(parsed)
+      setForm(parsed)
       if (parsed.avatar) setAvatar(parsed.avatar)
       if (parsed.skills) setSkills(parsed.skills)
-      reset(parsed)
       setIsEditing(false)
     }
-  }, [reset])
+  }, [])
 
-  // ✅ Handle avatar upload and persist as Base64
   const handleAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -49,7 +60,6 @@ const Profile: React.FC = () => {
     }
   }
 
-  // ✅ Add skills
   const handleAddSkill = () => {
     if (skillInput.trim()) {
       setSkills((prev) => [...prev, skillInput.trim()])
@@ -57,9 +67,14 @@ const Profile: React.FC = () => {
     }
   }
 
-  // ✅ Save profile
-  const onSubmit = (data: ProfileFormData) => {
-    const profileData = { ...data, avatar: avatar || preview, skills }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const profileData = { ...form, avatar: avatar || preview, skills }
     localStorage.setItem("userProfile", JSON.stringify(profileData))
     setSavedProfile(profileData)
     setAvatar(profileData.avatar || null)
@@ -81,7 +96,7 @@ const Profile: React.FC = () => {
             <h2 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
               Edit Profile
             </h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 text-black">
+            <form onSubmit={onSubmit} className="space-y-5 text-black">
               {/* Avatar Upload */}
               <div className="flex flex-col items-center">
                 <input
@@ -115,7 +130,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">Full Name</label>
                 <input
-                  {...register("name")}
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter your full name"
                 />
@@ -125,7 +142,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">Bio</label>
                 <textarea
-                  {...register("bio")}
+                  name="bio"
+                  value={form.bio}
+                  onChange={handleChange}
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="Write something about yourself"
                 />
@@ -135,7 +154,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">Location</label>
                 <input
-                  {...register("location")}
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="Where are you from?"
                 />
@@ -145,7 +166,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">Website</label>
                 <input
-                  {...register("website")}
+                  name="website"
+                  value={form.website}
+                  onChange={handleChange}
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="https://example.com"
                 />
@@ -155,7 +178,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">Email</label>
                 <input
-                  {...register("email")}
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   type="email"
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="you@example.com"
@@ -166,7 +191,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">LinkedIn</label>
                 <input
-                  {...register("linkedin")}
+                  name="linkedin"
+                  value={form.linkedin}
+                  onChange={handleChange}
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="https://linkedin.com/in/username"
                 />
@@ -176,7 +203,9 @@ const Profile: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold mb-1">GitHub</label>
                 <input
-                  {...register("github")}
+                  name="github"
+                  value={form.github}
+                  onChange={handleChange}
                   className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="https://github.com/username"
                 />
@@ -334,7 +363,4 @@ const Profile: React.FC = () => {
 }
 
 export default Profile
-function useForm<T>(): { register: any; handleSubmit: any; reset: any } {
-  throw new Error("Function not implemented.")
-}
 

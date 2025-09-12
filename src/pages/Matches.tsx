@@ -194,7 +194,7 @@ const Matches = () => {
       return;
     }
     try {
-  await sendConnectionRequest(user.uid, matchId);
+      await sendConnectionRequest(user.uid, matchId);
       setMatches(matches => matches.map(match =>
         match.id === matchId
           ? { ...match, isPending: true }
@@ -225,6 +225,20 @@ const Matches = () => {
     }
   };
 
+  const disconnectMatch = (matchId: string) => {
+    setConnections((prev) => {
+      const updated = { ...prev, [matchId]: 'default' };
+      localStorage.setItem('connections', JSON.stringify(updated));
+      return updated;
+    });
+    toast('Disconnected from the match.');
+  };
+
+  const scheduleMeeting = (matchId: string) => {
+    // Placeholder for scheduling logic - can integrate with calendar or scheduling API
+    toast(`Schedule meeting with ${matches.find(m => m.id === matchId)?.name}`);
+  };
+
   const getMatchScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-600 bg-green-100'
     if (score >= 80) return 'text-blue-600 bg-blue-100'
@@ -234,7 +248,7 @@ const Matches = () => {
 
   return (
   <div className="max-w-7xl mx-auto space-y-8 px-2 sm:px-4 md:px-8">
-      {/* Header */}
+      {/ Header /}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -252,14 +266,14 @@ const Matches = () => {
         </p>
       </motion.div>
 
-      {/* Search and Filters */}
+      {/ Search and Filters /}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
         className="space-y-6"
       >
-        {/* Search Bar */}
+        {/ Search Bar /}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <input
@@ -271,7 +285,7 @@ const Matches = () => {
           />
         </div>
 
-        {/* Filter Tabs */}
+        {/ Filter Tabs /}
         <div className="flex flex-wrap gap-2">
           {filters.map((filter) => (
             <button
@@ -289,7 +303,7 @@ const Matches = () => {
         </div>
       </motion.div>
 
-      {/* Matches Grid */}
+      {/ Matches Grid /}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -308,7 +322,7 @@ const Matches = () => {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="card space-y-4 p-4 sm:p-6"
               >
-                {/* Header */}
+                {/ Header /}
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                   <div className="flex items-center space-x-3">
                     <img
@@ -326,7 +340,7 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/* Company and Location */}
+                {/ Company and Location /}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-muted-foreground gap-1 sm:gap-0">
                   <div className="flex items-center space-x-1">
                     <Building className="h-4 w-4" />
@@ -338,12 +352,12 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/* Bio */}
+                {/ Bio /}
                 <p className="text-sm text-muted-foreground line-clamp-3">
                   {match.bio}
                 </p>
 
-                {/* Skills */}
+                {/ Skills /}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">Skills</h4>
                   <div className="flex flex-wrap gap-2">
@@ -363,7 +377,7 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/* Match Reasons */}
+                {/ Match Reasons /}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">Why you match</h4>
                   <div className="space-y-1">
@@ -382,26 +396,50 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/* Actions */}
+                {/ Actions /}
                 <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                  <button
-                    className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200
-                      ${connectState === 'connected' ? 'bg-green-500 text-white' : connectState === 'pending' ? 'bg-yellow-400 text-white' : 'bg-primary text-white hover:bg-primary/80'}`}
-                    onClick={() => {
-                      setPendingUser(match);
-                      setShowConfirm(true);
-                    }}
-                    disabled={connectState === 'pending' || connectState === 'connected'}
-                  >
-                    {connectState === 'connected' ? 'Connected' : connectState === 'pending' ? 'Pending' : 'Connect'}
-                  </button>
-                  {/* ...other buttons (Message, Schedule) can go here ... */}
+                  {connectState === 'connected' ? (
+                    <>
+                      <button
+                        className="flex-1 rounded-lg py-2 px-4 font-semibold bg-red-500 text-white shadow transition-all duration-200 hover:bg-red-600"
+                        onClick={() => disconnectMatch(match.id)}
+                      >
+                        Disconnect
+                      </button>
+                      <button
+                        className="flex-1 rounded-lg py-2 px-4 font-semibold bg-primary text-white shadow transition-all duration-200 hover:bg-primary/80 flex items-center justify-center gap-2"
+                        onClick={() => messageMatch(match.id)}
+                      >
+                        <MessageCircle className="h-5 w-5" />
+                        Message
+                      </button>
+                      <button
+                        className="flex-1 rounded-lg py-2 px-4 font-semibold bg-blue-600 text-white shadow transition-all duration-200 hover:bg-blue-700 flex items-center justify-center gap-2"
+                        onClick={() => scheduleMeeting(match.id)}
+                      >
+                        <Calendar className="h-5 w-5" />
+                        Schedule
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200
+                        ${connectState === 'pending' ? 'bg-yellow-400 text-white' : 'bg-primary text-white hover:bg-primary/80'}`}
+                      onClick={() => {
+                        setPendingUser(match);
+                        setShowConfirm(true);
+                      }}
+                      disabled={connectState === 'pending'}
+                    >
+                      {connectState === 'pending' ? 'Pending' : 'Connect'}
+                    </button>
+                  )}
                 </div>
               </motion.div>
             );
           })}
         </AnimatePresence>
-      {/* Confirmation Modal for Connect */}
+      {/ Confirmation Modal for Connect /}
     {showConfirm && pendingUser && (
   <motion.div
     initial={{ opacity: 0 }}
@@ -416,7 +454,7 @@ const Matches = () => {
       transition={{ duration: 0.3 }}
       className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-primary/30 rounded-2xl shadow-2xl p-8 w-full max-w-md"
     >
-      {/* Close Button */}
+      {/ Close Button /}
       <button
         onClick={() => setShowConfirm(false)}
         className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
@@ -424,17 +462,17 @@ const Matches = () => {
         <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
       </button>
 
-      {/* Title */}
+      {/ Title /}
       <h2 className="text-2xl font-bold text-center text-primary mb-4 text-blue-600">
         Connect Request
       </h2>
 
-      {/* Content */}
+      {/ Content /}
       <p className="text-center text-muted-foreground text-blue-600 mb-6">
         Do you want to connect with <span className="font-semibold text-blue-600">{pendingUser.name}</span>?
       </p>
 
-      {/* Action Buttons */}
+      {/ Action Buttons /}
       <div className="flex justify-center gap-4">
         <button
           className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:scale-105 transition transform shadow-lg hover:shadow-xl text-blue-600"
@@ -470,7 +508,7 @@ const Matches = () => {
 )}
       </motion.div>
 
-      {/* Empty State */}
+      {/ Empty State /}
       {filteredMatches.length === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -488,7 +526,7 @@ const Matches = () => {
         </motion.div>
       )}
 
-      {/* AI Insights */}
+      {/ AI Insights /}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

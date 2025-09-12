@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AIChatbot from '../components/ui/AIChatbot'
-import { 
-  Users, 
-  MessageCircle, 
-  Calendar, 
-  Star, 
-  MapPin, 
+import {
+  Users,
+  MessageCircle,
+  Calendar,
+  MapPin,
   Building,
-  Sparkles,
-  Filter,
-  Search,
-  Heart,
-  X,
   CheckCircle,
-  Clock
+  Search,
+  X,
 } from 'lucide-react'
 
 import toast from 'react-hot-toast'
@@ -129,9 +124,9 @@ const Matches = () => {
       isConnected: false,
       isPending: false,
     },
-  ]);
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  ])
+  const [selectedFilter, setSelectedFilter] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState<string>('')
 
   const filters = [
     { id: 'all', label: 'All Matches', count: matches.length },
@@ -141,103 +136,108 @@ const Matches = () => {
   ]
 
   const filteredMatches = matches.filter(match => {
-    const matchesSearch = match.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         match.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         match.company.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesFilter = selectedFilter === 'all' ||
-                         (selectedFilter === 'high' && match.matchScore >= 90) ||
-                         (selectedFilter === 'medium' && match.matchScore >= 70 && match.matchScore < 90) ||
-                         (selectedFilter === 'pending' && match.isPending)
-    
+    const lower = searchTerm.toLowerCase()
+    const matchesSearch =
+      match.name.toLowerCase().includes(lower) ||
+      match.title.toLowerCase().includes(lower) ||
+      match.company.toLowerCase().includes(lower)
+
+    const matchesFilter =
+      selectedFilter === 'all' ||
+      (selectedFilter === 'high' && match.matchScore >= 90) ||
+      (selectedFilter === 'medium' && match.matchScore >= 70 && match.matchScore < 90) ||
+      (selectedFilter === 'pending' && match.isPending)
+
     return matchesSearch && matchesFilter
   })
 
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [errorId, setErrorId] = useState<string | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [errorId, setErrorId] = useState<string | null>(null)
 
-  // Add connections state to track connection status for each match (persisted in localStorage)
+  // Persisted connections state from localStorage
   const [connections, setConnections] = useState<{ [key: string]: 'default' | 'pending' | 'connected' }>(() => {
-    const saved = localStorage.getItem('connections');
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingUser, setPendingUser] = useState<Match | null>(null);
+    if (typeof window === 'undefined') return {}
+    const saved = localStorage.getItem('connections')
+    return saved ? JSON.parse(saved) : {}
+  })
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingUser, setPendingUser] = useState<Match | null>(null)
 
   // Persist connections to localStorage
   useEffect(() => {
-    localStorage.setItem('connections', JSON.stringify(connections));
-  }, [connections]);
+    if (typeof window === 'undefined') return
+    localStorage.setItem('connections', JSON.stringify(connections))
+  }, [connections])
 
   // Update dashboard stats
   useEffect(() => {
-    const stats = JSON.parse(localStorage.getItem('stats-dashboard') || '{}');
-    stats.connections = Object.values(connections).filter((s: any) => s === 'connected').length;
-    localStorage.setItem('stats-dashboard', JSON.stringify(stats));
-  }, [connections]);
+    if (typeof window === 'undefined') return
+    const stats = JSON.parse(localStorage.getItem('stats-dashboard') || '{}')
+    stats.connections = Object.values(connections).filter((s: any) => s === 'connected').length
+    localStorage.setItem('stats-dashboard', JSON.stringify(stats))
+  }, [connections])
 
   // Get user and userProfile from authentication hook
-  const { user, userProfile } = useFirebaseAuth();
-  
-  const isProfileComplete = userProfile && userProfile.name && userProfile.bio && userProfile.avatar;
+  const { user, userProfile } = useFirebaseAuth()
+
+  const isProfileComplete = !!(userProfile && userProfile.name && userProfile.bio && userProfile.avatar)
+
   const connectWithMatch = async (matchId: string) => {
-    setLoadingId(matchId);
-    setErrorId(null);
+    setLoadingId(matchId)
+    setErrorId(null)
     if (!user) {
-      toast.error('You must be logged in to connect. Please log in or complete your profile.');
-      setLoadingId(null);
-      return;
+      toast.error('You must be logged in to connect. Please log in or complete your profile.')
+      setLoadingId(null)
+      return
     }
     if (!isProfileComplete) {
-      toast.error('Please complete your profile before connecting with others.');
-      setLoadingId(null);
-      return;
+      toast.error('Please complete your profile before connecting with others.')
+      setLoadingId(null)
+      return
     }
     try {
-      await sendConnectionRequest(user.uid, matchId);
-      setMatches(matches => matches.map(match =>
-        match.id === matchId
-          ? { ...match, isPending: true }
-          : match
-      ));
-      toast.success('Connection request sent!');
-      window.dispatchEvent(new CustomEvent('connection:added', { detail: { receiverId: matchId } }));
+      await sendConnectionRequest(user.uid, matchId)
+      setMatches(prev =>
+        prev.map(match =>
+          match.id === matchId ? { ...match, isPending: true } : match
+        )
+      )
+      toast.success('Connection request sent!')
+      window.dispatchEvent(new CustomEvent('connection:added', { detail: { receiverId: matchId } }))
     } catch (err) {
-      setErrorId(matchId);
-      toast.error('Failed to send connection request.');
+      setErrorId(matchId)
+      toast.error('Failed to send connection request.')
     } finally {
-      setLoadingId(null);
+      setLoadingId(null)
     }
   }
 
   const messageMatch = async (matchId: string) => {
-    setLoadingId(matchId);
-    setErrorId(null);
+    setLoadingId(matchId)
+    setErrorId(null)
     try {
-      // Backend: send message
-      await ApiService.chatWithAI({ prompt: `Hi ${matches.find(m => m.id === matchId)?.name}!`, context: matchId });
-      toast.success('Message sent!');
+      await ApiService.chatWithAI({ prompt: `Hi ${matches.find(m => m.id === matchId)?.name}!`, context: matchId })
+      toast.success('Message sent!')
     } catch (err) {
-      setErrorId(matchId);
-      toast.error('Failed to send message.');
+      setErrorId(matchId)
+      toast.error('Failed to send message.')
     } finally {
-      setLoadingId(null);
+      setLoadingId(null)
     }
-  };
+  }
 
   const disconnectMatch = (matchId: string) => {
-    setConnections((prev) => {
-      const updated = { ...prev, [matchId]: 'default' };
-      localStorage.setItem('connections', JSON.stringify(updated));
-      return updated;
-    });
-    toast('Disconnected from the match.');
-  };
+    setConnections(prev => {
+      const updated = { ...prev, [matchId]: 'default' }
+      if (typeof window !== 'undefined') localStorage.setItem('connections', JSON.stringify(updated))
+      return updated
+    })
+    toast('Disconnected from the match.')
+  }
 
   const scheduleMeeting = (matchId: string) => {
-    // Placeholder for scheduling logic - can integrate with calendar or scheduling API
-    toast(`Schedule meeting with ${matches.find(m => m.id === matchId)?.name}`);
-  };
+    toast(`Schedule meeting with ${matches.find(m => m.id === matchId)?.name}`)
+  }
 
   const getMatchScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-600 bg-green-100'
@@ -247,8 +247,8 @@ const Matches = () => {
   }
 
   return (
-  <div className="max-w-7xl mx-auto space-y-8 px-2 sm:px-4 md:px-8">
-      {/ Header /}
+    <div className="max-w-7xl mx-auto space-y-8 px-2 sm:px-4 md:px-8">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -256,7 +256,6 @@ const Matches = () => {
         className="text-center space-y-4"
       >
         <div className="flex items-center justify-center space-x-2">
-         
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">
             AI-Powered Matches
           </h1>
@@ -266,14 +265,14 @@ const Matches = () => {
         </p>
       </motion.div>
 
-      {/ Search and Filters /}
+      {/* Search and Filters */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
         className="space-y-6"
       >
-        {/ Search Bar /}
+        {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <input
@@ -285,7 +284,7 @@ const Matches = () => {
           />
         </div>
 
-        {/ Filter Tabs /}
+        {/* Filter Tabs */}
         <div className="flex flex-wrap gap-2">
           {filters.map((filter) => (
             <button
@@ -303,7 +302,7 @@ const Matches = () => {
         </div>
       </motion.div>
 
-      {/ Matches Grid /}
+      {/* Matches Grid */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -312,7 +311,7 @@ const Matches = () => {
       >
         <AnimatePresence>
           {filteredMatches.map((match, index) => {
-            const connectState = connections[match.id] || 'default';
+            const connectState = connections[match.id] || 'default'
             return (
               <motion.div
                 key={match.id}
@@ -322,7 +321,7 @@ const Matches = () => {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="card space-y-4 p-4 sm:p-6"
               >
-                {/ Header /}
+                {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                   <div className="flex items-center space-x-3">
                     <img
@@ -340,7 +339,7 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/ Company and Location /}
+                {/* Company and Location */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-muted-foreground gap-1 sm:gap-0">
                   <div className="flex items-center space-x-1">
                     <Building className="h-4 w-4" />
@@ -352,12 +351,12 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/ Bio /}
+                {/* Bio */}
                 <p className="text-sm text-muted-foreground line-clamp-3">
                   {match.bio}
                 </p>
 
-                {/ Skills /}
+                {/* Skills */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">Skills</h4>
                   <div className="flex flex-wrap gap-2">
@@ -377,7 +376,7 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/ Match Reasons /}
+                {/* Match Reasons */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">Why you match</h4>
                   <div className="space-y-1">
@@ -396,7 +395,7 @@ const Matches = () => {
                   </div>
                 </div>
 
-                {/ Actions /}
+                {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-2 pt-2">
                   {connectState === 'connected' ? (
                     <>
@@ -426,8 +425,8 @@ const Matches = () => {
                       className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200
                         ${connectState === 'pending' ? 'bg-yellow-400 text-white' : 'bg-primary text-white hover:bg-primary/80'}`}
                       onClick={() => {
-                        setPendingUser(match);
-                        setShowConfirm(true);
+                        setPendingUser(match)
+                        setShowConfirm(true)
                       }}
                       disabled={connectState === 'pending'}
                     >
@@ -436,79 +435,83 @@ const Matches = () => {
                   )}
                 </div>
               </motion.div>
-            );
+            )
           })}
         </AnimatePresence>
-      {/ Confirmation Modal for Connect /}
-    {showConfirm && pendingUser && (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-  >
-    <motion.div
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.9, opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-primary/30 rounded-2xl shadow-2xl p-8 w-full max-w-md"
-    >
-      {/ Close Button /}
-      <button
-        onClick={() => setShowConfirm(false)}
-        className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
-      >
-        <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-      </button>
 
-      {/ Title /}
-      <h2 className="text-2xl font-bold text-center text-primary mb-4 text-blue-600">
-        Connect Request
-      </h2>
+        {/* Confirmation Modal for Connect */}
+        {showConfirm && pendingUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-primary/30 rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
+              >
+                <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              </button>
 
-      {/ Content /}
-      <p className="text-center text-muted-foreground text-blue-600 mb-6">
-        Do you want to connect with <span className="font-semibold text-blue-600">{pendingUser.name}</span>?
-      </p>
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-center text-primary mb-4 text-blue-600">
+                Connect Request
+              </h2>
 
-      {/ Action Buttons /}
-      <div className="flex justify-center gap-4">
-        <button
-          className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:scale-105 transition transform shadow-lg hover:shadow-xl text-blue-600"
-          onClick={() => {
-            setConnections((prev: any) => {
-              const updated = { ...prev, [pendingUser.id]: 'pending' };
-              localStorage.setItem('connections', JSON.stringify(updated));
-              // Simulate acceptance after 3 minutes
-              setTimeout(() => {
-                const accepted = {
-                  ...JSON.parse(localStorage.getItem('connections') || '{}'),
-                  [pendingUser.id]: 'connected',
-                };
-                setConnections(accepted);
-                localStorage.setItem('connections', JSON.stringify(accepted));
-              }, 180000);
-              return updated;
-            });
-            setShowConfirm(false);
-          }}
-        >
-          ✅ Confirm
-        </button>
-        <button
-          className="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
-          onClick={() => setShowConfirm(false)}
-        >
-          ❌ Cancel
-        </button>
-      </div>
-    </motion.div>
-  </motion.div>
-)}
+              {/* Content */}
+              <p className="text-center text-muted-foreground text-blue-600 mb-6">
+                Do you want to connect with <span className="font-semibold text-blue-600">{pendingUser.name}</span>?
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex justify-center gap-4">
+                <button
+                  className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:scale-105 transition transform shadow-lg hover:shadow-xl text-blue-600"
+                  onClick={() => {
+                    setConnections((prev: any) => {
+                      const updated = { ...prev, [pendingUser.id]: 'pending' }
+                      if (typeof window !== 'undefined') localStorage.setItem('connections', JSON.stringify(updated))
+
+                      // Simulate acceptance after 3 minutes
+                      setTimeout(() => {
+                        if (typeof window === 'undefined') return
+                        const accepted = {
+                          ...JSON.parse(localStorage.getItem('connections') || '{}'),
+                          [pendingUser.id]: 'connected',
+                        }
+                        setConnections(accepted)
+                        localStorage.setItem('connections', JSON.stringify(accepted))
+                      }, 180000)
+
+                      return updated
+                    })
+                    setShowConfirm(false)
+                  }}
+                >
+                  ✅ Confirm
+                </button>
+                <button
+                  className="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
+                  onClick={() => setShowConfirm(false)}
+                >
+                  ❌ Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/ Empty State /}
+      {/* Empty State */}
       {filteredMatches.length === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -526,7 +529,7 @@ const Matches = () => {
         </motion.div>
       )}
 
-      {/ AI Insights /}
+      {/* AI Insights */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -534,18 +537,16 @@ const Matches = () => {
         className="card bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20"
       >
         <div className="flex items-start space-x-3">
-        
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground">AI Matchmaking Insights</h3>
             <p className="text-sm text-muted-foreground">
-              Our AI analyzes your profile, skills, interests, and goals to find the most relevant connections. 
+              Our AI analyzes your profile, skills, interests, and goals to find the most relevant connections.
               Match scores are based on skill overlap, shared interests, and complementary goals.
             </p>
-           
           </div>
         </div>
       </motion.div>
-       <AIChatbot/>
+      <AIChatbot />
     </div>
   )
 }

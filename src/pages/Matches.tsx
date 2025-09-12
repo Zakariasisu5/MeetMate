@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import AIChatbot from "../components/ui/AIChatbot"
-import { Users, MessageCircle, Calendar, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface Match {
@@ -43,8 +43,7 @@ const Matches = () => {
       title: "Smart Contract Developer",
       company: "Ethereum Foundation",
       location: "Berlin, Germany",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
       matchScore: 87,
       skills: ["Solidity", "Ethereum", "DeFi Protocols", "Rust"],
       interests: ["DeFi", "Blockchain", "Zero Knowledge"],
@@ -59,8 +58,7 @@ const Matches = () => {
       title: "Growth Marketing Manager",
       company: "Web3 Startup",
       location: "Seoul, South Korea",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
       matchScore: 82,
       skills: ["Growth Marketing", "Community Building", "Web3", "Analytics"],
       interests: ["Web3", "Community", "Growth"],
@@ -75,8 +73,7 @@ const Matches = () => {
       title: "AI Research Engineer",
       company: "AI Research Lab",
       location: "London, UK",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
       matchScore: 78,
       skills: ["Machine Learning", "Python", "AI Research", "Neural Networks"],
       interests: ["AI/ML", "Research", "Innovation"],
@@ -117,28 +114,28 @@ const Matches = () => {
     },
   ])
 
-  const [selectedFilter, setSelectedFilter] = useState<
-    "all" | "high" | "medium" | "pending"
-  >("all")
-  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [selectedFilter, setSelectedFilter] = useState<"all" | "high" | "medium" | "pending">("all")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [connections, setConnections] = useState<{ [key: string]: "default" | "pending" | "connected" }>(() => {
+    try {
+      const saved = localStorage.getItem("connections")
+      return saved ? JSON.parse(saved) : {}
+    } catch {
+      return {}
+    }
+  })
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingUser, setPendingUser] = useState<Match | null>(null)
+
+  useEffect(() => {
+    localStorage.setItem("connections", JSON.stringify(connections))
+  }, [connections])
 
   const filters = [
     { id: "all", label: "All Matches", count: matches.length },
-    {
-      id: "high",
-      label: "High Match (90%+)",
-      count: matches.filter((m) => m.matchScore >= 90).length,
-    },
-    {
-      id: "medium",
-      label: "Medium Match (70-89%)",
-      count: matches.filter((m) => m.matchScore >= 70 && m.matchScore < 90).length,
-    },
-    {
-      id: "pending",
-      label: "Pending",
-      count: matches.filter((m) => m.isPending).length,
-    },
+    { id: "high", label: "High Match (90%+)", count: matches.filter((m) => m.matchScore >= 90).length },
+    { id: "medium", label: "Medium Match (70-89%)", count: matches.filter((m) => m.matchScore >= 70 && m.matchScore < 90).length },
+    { id: "pending", label: "Pending", count: matches.filter((m) => m.isPending).length },
   ]
 
   const filteredMatches = matches.filter((match) => {
@@ -149,26 +146,10 @@ const Matches = () => {
     const matchesFilter =
       selectedFilter === "all" ||
       (selectedFilter === "high" && match.matchScore >= 90) ||
-      (selectedFilter === "medium" &&
-        match.matchScore >= 70 &&
-        match.matchScore < 90) ||
+      (selectedFilter === "medium" && match.matchScore >= 70 && match.matchScore < 90) ||
       (selectedFilter === "pending" && match.isPending)
     return matchesSearch && matchesFilter
   })
-
-  const [connections, setConnections] = useState<{
-    [key: string]: "default" | "pending" | "connected"
-  }>(() => {
-    const saved = localStorage.getItem("connections")
-    return saved ? JSON.parse(saved) : {}
-  })
-
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [pendingUser, setPendingUser] = useState<Match | null>(null)
-
-  useEffect(() => {
-    localStorage.setItem("connections", JSON.stringify(connections))
-  }, [connections])
 
   const getMatchScoreColor = (score: number) => {
     if (score >= 90) return "text-green-600 bg-green-100"
@@ -180,36 +161,34 @@ const Matches = () => {
   const disconnectMatch = (matchId: string) => {
     setConnections((prev) => {
       const updated = { ...prev, [matchId]: "default" }
-      localStorage.setItem("connections", JSON.stringify(updated))
       toast.success("Disconnected successfully")
       return updated
     })
   }
 
+  const confirmConnect = () => {
+    if (!pendingUser) return
+    setConnections((prev) => ({ ...prev, [pendingUser.id]: "pending" }))
+    toast.success(`Connection request sent to ${pendingUser.name}`)
+    setShowConfirm(false)
+    setPendingUser(null)
+  }
+
+  const cancelConnect = () => {
+    setShowConfirm(false)
+    setPendingUser(null)
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-8 px-2 sm:px-4 md:px-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center space-y-4"
-      >
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-          AI-Powered Matches
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Discover people who share your interests and goals at this conference
-        </p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center space-y-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground">AI-Powered Matches</h1>
+        <p className="text-lg text-muted-foreground">Discover people who share your interests and goals at this conference</p>
       </motion.div>
 
       {/* Search + Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="space-y-6"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <input
@@ -224,13 +203,9 @@ const Matches = () => {
           {filters.map((filter) => (
             <button
               key={filter.id}
-              onClick={() =>
-                setSelectedFilter(filter.id as typeof selectedFilter)
-              }
+              onClick={() => setSelectedFilter(filter.id as typeof selectedFilter)}
               className={`px-4 py-2 rounded-2xl text-sm font-medium ${
-                selectedFilter === filter.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                selectedFilter === filter.id ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               }`}
             >
               {filter.label} ({filter.count})
@@ -240,12 +215,7 @@ const Matches = () => {
       </motion.div>
 
       {/* Matches Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <AnimatePresence>
           {filteredMatches.map((match, index) => {
             const connectState = connections[match.id] || "default"
@@ -261,52 +231,30 @@ const Matches = () => {
                 {/* Header */}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-3">
-                    <img
-                      src={match.avatar}
-                      alt={match.name}
-                      className="w-12 h-12 rounded-2xl object-cover"
-                    />
+                    <img src={match.avatar} alt={match.name} className="w-12 h-12 rounded-2xl object-cover" />
                     <div>
                       <h3 className="font-semibold">{match.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {match.title}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{match.title}</p>
                     </div>
                   </div>
-                  <div
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchScoreColor(
-                      match.matchScore
-                    )}`}
-                  >
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchScoreColor(match.matchScore)}`}>
                     {match.matchScore}%
                   </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {match.bio}
-                </p>
+                <p className="text-sm text-muted-foreground line-clamp-3">{match.bio}</p>
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-2 pt-2">
                   {connectState === "connected" ? (
                     <>
-                      <button className="flex-1 rounded-lg py-2 px-4 font-semibold bg-green-500 text-white">
-                        Connected
-                      </button>
-                      <button
-                        onClick={() => disconnectMatch(match.id)}
-                        className="flex-1 rounded-lg py-2 px-4 font-semibold bg-red-500 text-white hover:bg-red-600"
-                      >
-                        Disconnect
-                      </button>
+                      <button className="flex-1 rounded-lg py-2 px-4 font-semibold bg-green-500 text-white">Connected</button>
+                      <button onClick={() => disconnectMatch(match.id)} className="flex-1 rounded-lg py-2 px-4 font-semibold bg-red-500 text-white hover:bg-red-600">Disconnect</button>
                     </>
                   ) : (
                     <button
-                      className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200
-                      ${
-                        connectState === "pending"
-                          ? "bg-yellow-400 text-white"
-                          : "bg-primary text-white hover:bg-primary/80"
+                      className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200 ${
+                        connectState === "pending" ? "bg-yellow-400 text-white" : "bg-primary text-white hover:bg-primary/80"
                       }`}
                       onClick={() => {
                         setPendingUser(match)
@@ -324,6 +272,23 @@ const Matches = () => {
         </AnimatePresence>
       </motion.div>
 
+      {/* Connect Confirmation Modal */}
+      {showConfirm && pendingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full space-y-4">
+            <h3 className="text-lg font-semibold">Send Connection Request?</h3>
+            <p>
+              Are you sure you want to send a connection request to <strong>{pendingUser.name}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button onClick={cancelConnect} className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">Cancel</button>
+              <button onClick={confirmConnect} className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/80">Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Chatbot */}
       <AIChatbot />
     </div>
   )

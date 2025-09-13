@@ -20,6 +20,8 @@ interface Match {
   isPending: boolean
 }
 
+type ConnectionStatus = "default" | "pending" | "connected"
+
 const Matches = () => {
   const [matches] = useState<Match[]>([
     {
@@ -116,7 +118,7 @@ const Matches = () => {
 
   const [selectedFilter, setSelectedFilter] = useState<"all" | "high" | "medium" | "pending">("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const [connections, setConnections] = useState<{ [key: string]: "default" | "pending" | "connected" }>(() => {
+  const [connections, setConnections] = useState<{ [key: string]: ConnectionStatus }>(() => {
     try {
       const saved = localStorage.getItem("connections")
       return saved ? JSON.parse(saved) : {}
@@ -135,7 +137,7 @@ const Matches = () => {
     { id: "all", label: "All Matches", count: matches.length },
     { id: "high", label: "High Match (90%+)", count: matches.filter((m) => m.matchScore >= 90).length },
     { id: "medium", label: "Medium Match (70-89%)", count: matches.filter((m) => m.matchScore >= 70 && m.matchScore < 90).length },
-    { id: "pending", label: "Pending", count: matches.filter((m) => m.isPending).length },
+    { id: "pending", label: "Pending", count: matches.filter((m) => connections[m.id] === "pending").length },
   ]
 
   const filteredMatches = matches.filter((match) => {
@@ -147,7 +149,7 @@ const Matches = () => {
       selectedFilter === "all" ||
       (selectedFilter === "high" && match.matchScore >= 90) ||
       (selectedFilter === "medium" && match.matchScore >= 70 && match.matchScore < 90) ||
-      (selectedFilter === "pending" && match.isPending)
+      (selectedFilter === "pending" && connections[match.id] === "pending")
     return matchesSearch && matchesFilter
   })
 
@@ -160,7 +162,7 @@ const Matches = () => {
 
   const disconnectMatch = (matchId: string) => {
     setConnections((prev) => {
-      const updated = { ...prev, [matchId]: "default" }
+      const updated: typeof prev = { ...prev, [matchId]: "default" }
       toast.success("Disconnected successfully")
       return updated
     })
@@ -273,20 +275,57 @@ const Matches = () => {
       </motion.div>
 
       {/* Connect Confirmation Modal */}
-      {showConfirm && pendingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-sm w-full space-y-4">
-            <h3 className="text-lg font-semibold">Send Connection Request?</h3>
-            <p>
-              Are you sure you want to send a connection request to <strong>{pendingUser.name}</strong>?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button onClick={cancelConnect} className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">Cancel</button>
-              <button onClick={confirmConnect} className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/80">Confirm</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showConfirm && pendingUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-gray bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 50, opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gray rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4"
+            >
+              {/* User Info */}
+              <div className="flex items-center space-x-4" >
+                <img src={pendingUser.avatar} alt={pendingUser.name} className="w-14 h-14 rounded-2xl object-cover" />
+                <div>
+                  <h3 className="text-lg font-semibold">{pendingUser.name}</h3>
+                  <p className="text-sm text-muted-foreground">{pendingUser.title}</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                Are you sure you want to send a connection request to <strong>{pendingUser.name}</strong>?
+              </p>
+
+              <div className="flex justify-end gap-3 mt-2">
+                <motion.button
+                  whileHover={{ scale: 1.05, backgroundColor: "#E5E7EB" }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={cancelConnect}
+                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium transition"
+                >
+                  Cancel
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05, backgroundColor: "#2563EB" }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={confirmConnect}
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-medium transition"
+                >
+                  Confirm
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* AI Chatbot */}
       <AIChatbot />

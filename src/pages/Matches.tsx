@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import AIChatbot from "../components/ui/AIChatbot"
+import ChatPopup from "../components/ui/ChatPopup"
 import { Search } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -168,6 +169,50 @@ const Matches = () => {
     })
   }
 
+  const acceptConnection = (matchId: string) => {
+    setConnections((prev) => ({ ...prev, [matchId]: "connected" }))
+    const matched = matches.find((m) => m.id === matchId)
+    toast.success(`You're now connected with ${matched?.name ?? "user"}`)
+  }
+
+  const cancelRequest = (matchId: string) => {
+    setConnections((prev) => ({ ...prev, [matchId]: "default" }))
+    const matched = matches.find((m) => m.id === matchId)
+    toast(`Cancelled request to ${matched?.name ?? "user"}`)
+  }
+
+  const messageUser = (match: Match) => {
+    setActiveChat(match)
+  }
+
+  const [profileModal, setProfileModal] = useState<Match | null>(null)
+
+  // Chat state (persisted)
+  const [activeChat, setActiveChat] = useState<Match | null>(null)
+  const [chats, setChats] = useState<Record<string, { id: string; from: "me" | "them"; text: string; ts: number }[]>>(() => {
+    try {
+      const saved = localStorage.getItem("chats")
+      return saved ? JSON.parse(saved) : {}
+    } catch {
+      return {}
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem("chats", JSON.stringify(chats))
+  }, [chats])
+
+  const closeChat = () => setActiveChat(null)
+
+  const sendMessage = (matchId: string, text: string) => {
+    const msg = { id: String(Date.now()), from: "me" as const, text, ts: Date.now() }
+    setChats((prev) => {
+      const userMsgs = prev[matchId] ? [...prev[matchId], msg] : [msg]
+      return { ...prev, [matchId]: userMsgs }
+    })
+    toast.success("Message sent")
+  }
+
   const confirmConnect = () => {
     if (!pendingUser) return
     setConnections((prev) => ({ ...prev, [pendingUser.id]: "pending" }))
@@ -233,9 +278,14 @@ const Matches = () => {
                 {/* Header */}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-3">
-                    <img src={match.avatar} alt={match.name} className="w-12 h-12 rounded-2xl object-cover" />
+                    <img
+                      src={match.avatar}
+                      alt={match.name}
+                      className="w-12 h-12 rounded-2xl object-cover cursor-pointer"
+                      onClick={() => setProfileModal(match)}
+                    />
                     <div>
-                      <h3 className="font-semibold">{match.name}</h3>
+                      <h3 className="font-semibold cursor-pointer" onClick={() => setProfileModal(match)}>{match.name}</h3>
                       <p className="text-sm text-muted-foreground">{match.title}</p>
                     </div>
                   </div>
@@ -246,25 +296,54 @@ const Matches = () => {
 
                 <p className="text-sm text-muted-foreground line-clamp-3">{match.bio}</p>
 
+                {/* Company & Location */}
+                <div className="mt-2 text-sm text-muted-foreground flex items-center gap-3">
+                  <span className="font-medium">{match.company}</span>
+                  <span>•</span>
+                  <span>{match.location}</span>
+                </div>
+
+                {/* Skills */}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {match.skills.slice(0, 6).map((s, i) => (
+                    <span key={i} className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">{s}</span>
+                  ))}
+                </div>
+
+                {/* Interests & Goals (small) */}
+                <div className="mt-3 text-xs text-muted-foreground flex flex-col gap-1">
+                  <div>
+                    <strong className="text-sm text-foreground">Interests:</strong> {match.interests.join(", ")}
+                  </div>
+                  <div>
+                    <strong className="text-sm text-foreground">Goals:</strong> {match.goals.join(" • ")}
+                  </div>
+                </div>
+
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-2 pt-2">
                   {connectState === "connected" ? (
                     <>
+                      <button onClick={() => messageUser(match)} className="flex-1 rounded-lg py-2 px-4 font-semibold bg-indigo-600 text-white hover:bg-indigo-700">Message</button>
                       <button className="flex-1 rounded-lg py-2 px-4 font-semibold bg-green-500 text-white">Connected</button>
                       <button onClick={() => disconnectMatch(match.id)} className="flex-1 rounded-lg py-2 px-4 font-semibold bg-red-500 text-white hover:bg-red-600">Disconnect</button>
                     </>
+                  ) : connectState === "pending" ? (
+                    <>
+                      <button onClick={() => acceptConnection(match.id)} className="flex-1 rounded-lg py-2 px-4 font-semibold bg-primary text-white hover:bg-primary/80">Accept</button>
+                      <button onClick={() => cancelRequest(match.id)} className="flex-1 rounded-lg py-2 px-4 font-semibold bg-gray-200 text-gray-800">Cancel Request</button>
+                    </>
                   ) : (
                     <button
-                      className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200 ${
-                        connectState === "pending" ? "bg-yellow-400 text-white" : "bg-primary text-white hover:bg-primary/80"
-                      }`}
+                      aria-label={`Send connection request to ${match.name}`}
+                      title={`Send connection request to ${match.name}`}
+                      className={`flex-1 rounded-lg py-2 px-4 font-semibold shadow transition-all duration-200 bg-primary text-white hover:bg-primary/80`}
                       onClick={() => {
                         setPendingUser(match)
                         setShowConfirm(true)
                       }}
-                      disabled={connectState === "pending"}
                     >
-                      {connectState === "pending" ? "Pending" : "Connect"}
+                      Connect
                     </button>
                   )}
                 </div>
@@ -326,6 +405,49 @@ const Matches = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {profileModal && (
+          <motion.div className="fixed inset-0 bg-gray bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+              <div className="flex items-center gap-4">
+                <img src={profileModal.avatar} alt={profileModal.name} className="w-20 h-20 rounded-2xl object-cover" />
+                <div>
+                  <h3 className="text-xl font-bold">{profileModal.name}</h3>
+                  <p className="text-sm text-muted-foreground">{profileModal.title} • {profileModal.company}</p>
+                  <p className="text-sm text-muted-foreground">{profileModal.location}</p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm text-muted-foreground">{profileModal.bio}</p>
+
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold">Skills</h4>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {profileModal.skills.map((s, i) => (
+                    <span key={i} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">{s}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <button onClick={() => setProfileModal(null)} className="px-4 py-2 rounded-lg bg-gray-200">Close</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Popup */}
+      {activeChat && (
+        <ChatPopup
+          match={{ id: activeChat.id, name: activeChat.name, avatar: activeChat.avatar }}
+          messages={chats[activeChat.id] || []}
+          onSend={(text) => sendMessage(activeChat.id, text)}
+          onClose={closeChat}
+        />
+      )}
 
       {/* AI Chatbot */}
       <AIChatbot />

@@ -1,147 +1,70 @@
-
- [
-  { "question": "Can AI suggest people to meet based on location?", "answer": "Yes! AI can recommend nearby users attending the same event or in your city." },
-  { "question": "Can I schedule reminders for follow-ups?", "answer": "Yes! AI can notify you to follow up after meetings or messages." },
-  { "question": "Can AI recommend personalized events?", "answer": "Yes! Receive suggestions tailored to your interests, skills, and goals." },
-  { "question": "Can I track shared files in chats?", "answer": "Yes! AI organizes shared documents, links, and attachments for easy access." },
-  { "question": "Can AI suggest icebreakers for virtual meetings?", "answer": "Yes! Get creative conversation starters for online networking sessions." },
-  { "question": "Can I schedule reminders for profile updates?", "answer": "Yes! AI reminds you to keep your profile current and engaging." },
-  { "question": "Can AI analyze event feedback?", "answer": "Yes! Summarize responses, ratings, and comments to improve future events." },
-  { "question": "Can AI provide connection recommendations based on goals?", "answer": "Yes! Match with users whose objectives align with yours." },
-  { "question": "Can AI suggest discussion topics?", "answer": "Yes! Receive relevant conversation ideas based on shared interests." },
-  { "question": "Can AI summarize meeting notes?", "answer": "Yes! Get concise overviews of key points and action items." },
-  { "question": "Can I track which users read my messages?", "answer": "Yes! See which connections viewed or responded to your messages." },
-  { "question": "Can AI suggest networking strategies for events?", "answer": "Yes! Get guidance on whom to meet and what to discuss for maximum impact." },
-  { "question": "Can I save AI-recommended connections?", "answer": "Yes! Bookmark suggestions to review or connect later." },
-  { "question": "Can AI help prioritize responses?", "answer": "Yes! Rank messages by importance and relevance to your goals." },
-  { "question": "Can I schedule recurring networking reminders?", "answer": "Yes! AI can remind you to follow up with key connections periodically." },
-  { "question": "Can AI analyze my communication style?", "answer": "Yes! Get insights to improve messaging tone, clarity, and engagement." },
-  { "question": "Can AI suggest event promotion strategies?", "answer": "Yes! Tips on reaching the right audience and maximizing attendance." },
-  { "question": "Can AI recommend new skills to learn?", "answer": "Yes! Based on your profile and goals, AI suggests relevant skills and courses." },
-  { "question": "Can I categorize connections with AI help?", "answer": "Yes! Organize contacts by importance, industry, or engagement level." },
-  { "question": "Can AI suggest potential mentors?", "answer": "Yes! Connect with experienced users who can guide your professional growth." },
-  { "question": "Can AI recommend personalized content?", "answer": "Yes! Articles, posts, and news tailored to your interests and goals." },
-  { "question": "Can AI predict which events I’ll enjoy?", "answer": "Yes! Suggest events based on past attendance, interests, and preferences." },
-  { "question": "Can AI recommend the best time to message someone?", "answer": "Yes! Receive optimal timing suggestions for sending connection requests or follow-ups." },
-  { "question": "Can AI create networking summaries?", "answer": "Yes! Summarize weekly or monthly interactions for easy review." },
-  { "question": "Can AI highlight important messages?", "answer": "Yes! Automatically mark high-priority chats and notifications." },
-  { "question": "Can AI provide virtual networking tips?", "answer": "Yes! Guidance for engaging effectively in online meetings and events." },
-  { "question": "Can I customize AI suggestions?", "answer": "Yes! Adjust focus areas like networking, events, or skill-building." },
-  { "question": "Can AI track my event attendance trends?", "answer": "Yes! Monitor how often you attend and engage at events." },
-  { "question": "Can AI suggest people with shared goals?", "answer": "Yes! Find users whose objectives align closely with yours." },
-  { "question": "Can AI recommend personalized meeting agendas?", "answer": "Yes! Receive structured agendas to maximize efficiency and outcomes." },
-  { "question": "Can AI help organize large events?", "answer": "Yes! Suggest scheduling, participant management, and communication strategies." },
-  { "question": "Can AI summarize participant profiles?", "answer": "Yes! Get concise insights on attendees for preparation before events." },
-  { "question": "Can AI track my networking progress?", "answer": "Yes! Visual dashboards show growth, interactions, and success rates." },
-  { "question": "Can AI recommend collaboration opportunities?", "answer": "Yes! Identify projects or events where you can partner with others." },
-  { "question": "Can AI suggest icebreaker questions?", "answer": "Yes! Get engaging questions to start meaningful conversations." },
-  { "question": "Can AI highlight active users?", "answer": "Yes! Identify who is most responsive and engaged in the community." },
-  { "question": "Can AI recommend virtual event formats?", "answer": "Yes! Choose the best formats like webinars, workshops, or roundtables." },
-  { "question": "Can AI provide reminders for important dates?", "answer": "Yes! Stay on top of birthdays, anniversaries, and networking milestones." },
-  { "question": "Can AI analyze chat sentiment?", "answer": "Yes! Understand the tone and mood of your conversations for better communication." },
-  { "question": "Can AI suggest ways to increase engagement?", "answer": "Yes! Tips to make your events, messages, and profiles more interactive." },
-  { "question": "Can AI help with follow-up message templates?", "answer": "Yes! Get professional, ready-to-send messages for connections and events." },
-  { "question": "Can AI prioritize which events to attend?", "answer": "Yes! Recommendations based on relevance, timing, and goals." },
-  { "question": "Can AI suggest conversation topics for networking?", "answer": "Yes! Receive tailored discussion points for specific people or events." },
-  { "question": "Can AI summarize event highlights?", "answer": "Yes! Condensed summaries of key moments and participants." },
-  { "question": "Can AI recommend attendees to connect with post-event?", "answer": "Yes! Identify users who share common interests or goals." },
-  { "question": "Can AI help with event feedback analysis?", "answer": "Yes! Automatically categorize comments and ratings to improve future events." },
-  { "question": "Can AI track my engagement score?", "answer": "Yes! Metrics show how active and responsive you are within the community." },
-  { "question": "Can AI suggest skills to showcase on my profile?", "answer": "Yes! Highlight relevant abilities to attract meaningful connections." },
-  { "question": "Can AI create suggested schedules?", "answer": "Yes! Optimize your day with AI-planned meetings and events." },
-  { "question": "Can AI recommend groups to join?", "answer": "Yes! Find communities that match your professional or personal interests." },
-  { "question": "Can AI highlight trending topics in my network?", "answer": "Yes! Stay informed about the most popular discussions and events." },
-  { "question": "Can AI suggest virtual networking games?", "answer": "Yes! Fun, interactive ways to break the ice and build connections." },
-  { "question": "Can AI help prioritize messages for response?", "answer": "Yes! Alerts for high-priority chats and actionable items." },
-  { "question": "Can AI recommend personalized introductions?", "answer": "Yes! Suggested messages for connecting with specific users." },
-  { "question": "Can AI track my learning progress?", "answer": "Yes! Visual dashboards for skills and goals achieved." },
-  { "question": "Can AI suggest networking sequences?", "answer": "Yes! Step-by-step guidance for meeting and engaging with users." },
-  { "question": "Can AI summarize saved profiles?", "answer": "Yes! Quick overviews of bookmarked users for reference." },
-  { "question": "Can AI help identify high-potential connections?", "answer": "Yes! Recommendations based on relevance and engagement level." },
-  { "question": "Can AI recommend content to share with connections?", "answer": "Yes! Personalized suggestions for articles, posts, and updates." },
-  { "question": "Can AI track event RSVPs?", "answer": "Yes! Monitor who has accepted or declined your event invitations." },
-  { "question": "Can AI provide feedback on my messages?", "answer": "Yes! Suggestions for improving tone, clarity, and professionalism." },
-  { "question": "Can AI create event reminder notifications?", "answer": "Yes! Receive automated reminders for upcoming meetings and deadlines." },
-  { "question": "Can AI suggest potential co-hosts?", "answer": "Yes! Recommend users with complementary skills for event management." },
-  { "question": "Can AI highlight key participants in chats?", "answer": "Yes! Identify the most engaged users in a conversation thread." },
-  { "question": "Can AI suggest networking tasks to complete?", "answer": "Yes! Recommendations for activities to strengthen your connections." },
-  { "question": "Can AI summarize my weekly networking activity?", "answer": "Yes! Condensed reports of meetings, messages, and events." },
-  { "question": "Can AI recommend offline networking opportunities?", "answer": "Yes! Suggestions for meetups and events in your area." },
-  { "question": "Can AI help prioritize tasks for events?", "answer": "Yes! Automated suggestions for preparation and follow-up actions." },
-  { "question": "Can AI track user engagement trends?", "answer": "Yes! Insights into which connections are most interactive over time." },
-  { "question": "Can AI suggest conversation templates?", "answer": "Yes! Ready-to-use messages for introductions, follow-ups, or event invites." },
-  { "question": "Can AI create personalized checklists?", "answer": "Yes! Tailor tasks for networking, events, or skill-building." },
-  { "question": "Can AI suggest ways to grow my network?", "answer": "Yes! Targeted strategies for expanding your connections efficiently." },
-  { "question": "Can AI highlight inactive connections?", "answer": "Yes! Identify users who haven’t interacted recently for re-engagement." },
-  { "question": "Can AI provide recommendations based on recent interactions?", "answer": "Yes! Get suggestions tailored to your latest conversations and meetings." },
-  { "question": "Can AI track my event attendance history?", "answer": "Yes! View past events attended and related insights." },
-  { "question": "Can AI help plan multi-step networking strategies?", "answer": "Yes! Create sequences of actions to maximize engagement." },
-  { "question": "Can AI recommend collaborations for projects?", "answer": "Yes! Match with users whose skills complement your goals." },
-  { "question": "Can AI highlight connections to prioritize?", "answer": "Yes! Suggestions based on relevance, engagement, and goals." },
-  { "question": "Can AI suggest group chat topics?", "answer": "Yes! Contextual topics"},
-
+[
   {
-    "question": "How do I delete my account?",
-  "answer": "To delete your account, go to Account Settings, scroll down, and click 'Delete Account'. Please confirm your choice to permanently remove your account. We're sorry to see you go and hope you'll return in the future."
+    "question": "Can AI suggest people to meet based on location?",
+    "answer": "Absolutely — I can surface nearby attendees and people in your city who match your interests. I look at location, event attendance, and shared topics to recommend the best nearby matches."
   },
   {
-    "question": "Are there free and paid features?",
-  "answer": "MeetMate offers a free tier with essential features for everyone. Premium plans unlock advanced scheduling, analytics, and priority support. We strive to provide great value at every level."
+    "question": "Can I schedule reminders for follow-ups?",
+    "answer": "Yes — I can create friendly follow-up reminders for messages and meetings, and suggest optimal days/times so your outreach gets the best response."
+  },
+  {
+    "question": "Can AI recommend personalized events?",
+    "answer": "Yes — I suggest events that match your profile, skills, and goals. I prioritize events other users like you attended and events with high relevance to your interests."
+  },
+  {
+    "question": "Can AI suggest icebreakers for virtual meetings?",
+    "answer": "Yes — I generate short, context-aware icebreakers based on profiles and shared interests so conversations start naturally."
+  },
+  {
+    "question": "Can AI summarize meeting notes?",
+    "answer": "Yes — I can produce concise summaries with action items, decisions, and suggested next steps so nothing gets lost after a meeting."
+  },
+  {
+    "question": "Can AI provide connection recommendations based on goals?",
+    "answer": "Yes — tell me a goal (for example, \"find collaborators\" or \"learn DeFi UX\") and I'll recommend people whose profiles and activity indicate alignment."
+  },
+  {
+    "question": "Can I track which users read my messages?",
+    "answer": "Yes — I can show read receipts for messages and highlight conversations that received a reply or need a follow-up."
+  },
+  {
+    "question": "Can AI help prioritize responses?",
+    "answer": "Yes — I rank inbound messages by urgency and relevance to your goals, and can suggest quick replies for each high-priority thread."
+  },
+  {
+    "question": "Can AI recommend personalized meeting agendas?",
+    "answer": "Yes — I draft short agendas with objectives and talking points tailored to the participants and the meeting length."
+  },
+  {
+    "question": "Can AI suggest people with shared goals?",
+    "answer": "Yes — tell me a goal and I’ll return people whose profiles and activity indicate alignment."
+  },
+  {
+    "question": "Who should I connect with right now?",
+    "answer": "Here are six high-value people from your current matches you should consider connecting with:\n\n1. Anna Chen — Product Designer (DeFi Labs). Great if you want product and UX insights in decentralized products.\n2. Marcus Rodriguez — Smart Contract Developer (Ethereum Foundation). Ideal for technical collaboration on DeFi projects.\n3. Sarah Kim — Growth Marketing Manager (Web3 Startup). Strong for growth strategy and community-building advice.\n4. David Thompson — AI Research Engineer (AI Research Lab). Helpful for AI integrations and research collaborations.\n5. Emily Carter — Community Lead (DAO Collective). Excellent if you want practical DAO/community guidance.\n6. James Lee — Full Stack Developer (Startup Hub). Good for hands-on implementation and quick prototyping.\n\nIf you tell me what outcome you want (for example, \"find a co-founder\" or \"learn DeFi UX\"), I’ll reorder this list and provide suggested message openers for each person."
+  },
+  {
+    "question": "What’s the best meet for me?",
+    "answer": "To suggest the best meeting format and agenda, tell me whether you prefer a quick 15-minute intro, a hands-on collaboration session, or a longer discovery call. Based on your profile and goals, my current pick would be:\n\n- Quick 15-minute intro at the start of the day to establish rapport and agree on next steps.\n- If collaboration is the goal, schedule a 60-minute workshop with a short agenda: quick intros, problem framing, and two 20-minute breakout work sessions.\n\nIf you want, I’ll pick which people from your matches should attend and create an agenda and invitation text for you."
+  },
+  {
+    "question": "Can I customize AI suggestions?",
+    "answer": "Yes — you can choose focus areas (networking, event planning, skill-building), and I’ll tailor recommendations accordingly."
+  },
+  {
+    "question": "Can AI suggest icebreaker questions?",
+    "answer": "Yes — I create concise icebreakers tied to someone’s profile or the event topic to make introductions easy and natural."
+  },
+  {
+    "question": "Can AI analyze chat sentiment?",
+    "answer": "Yes — I rate message tone and highlight conversations that may need a more thoughtful response."
+  },
+  {
+    "question": "How do I delete my account?",
+    "answer": "To delete your account, go to Account Settings, scroll down, and click 'Delete Account'. Please confirm your choice to permanently remove your account. We're sorry to see you go and hope you'll return in the future."
   },
   {
     "question": "How do I contact MeetMate support?",
-  "answer": "If you need help or have questions, please use the 'Contact Us' form in the app or email support@meetmate.com. Our friendly team will respond as soon as possible and is always happy to assist you."
-  },
-  {
-    "question": "What’s on the MeetMate roadmap?",
-  "answer": "Our roadmap includes exciting new features such as group events, AI-powered recommendations, and deeper integrations with calendar apps. We value your feedback and are committed to continuous improvement."
-  },
-  {
-    "question": "Can I use MeetMate on mobile?",
-  "answer": "Yes, MeetMate works great on mobile browsers, and we are developing a dedicated app for even better mobile experiences. Thank you for your interest!"
-  },
-  {
-    "question": "How do I manage notifications?",
-  "answer": "To manage notifications, go to Settings > Notifications and customize alerts for messages, meetings, and connections according to your preferences."
-  },
-  {
-    "question": "How do I report a problem or user?",
-  "answer": "If you encounter a problem or wish to report a user, please use the 'Report' button on any profile or event, or contact our support team directly. We take all reports seriously and aim to maintain a safe and respectful community."
-  },
-  {
-    "question": "Is my data private on MeetMate?",
-  "answer": "Your privacy is very important to us. Your data is private and only shared with connections you approve. MeetMate will never sell or share your personal information."
+    "answer": "If you need help or have questions, please use the 'Contact Us' form in the app or email support@meetmate.com. Our friendly team will respond as soon as possible and are happy to assist you."
   }
-  ,
-  { "question": "How do I change my email address?", "answer": "To change your email, go to Account Settings and select 'Change Email'. Enter your new email and follow the verification steps. If you need help, our support team is happy to assist you." },
-  { "question": "Can I block or mute users?", "answer": "Yes, you can block or mute users from their profile or chat window. This helps you control your experience and maintain a positive environment." },
-  { "question": "How do I customize my MeetMate profile?", "answer": "Visit your profile page and click 'Edit'. You can add a profile picture, update your bio, and share your interests to help others connect with you." },
-  { "question": "Does MeetMate support group chats?", "answer": "Group chat is coming soon! For now, you can chat one-on-one with your connections. Stay tuned for updates on group features." },
-  { "question": "How do I join an event on MeetMate?", "answer": "Browse available events and click 'Join'. You’ll receive updates and can interact with other attendees before, during, and after the event." },
-  { "question": "Can I create my own event?", "answer": "Absolutely! Click 'Create Event' in your dashboard, fill in the details, and invite connections. You’re in control of your event experience." },
-  { "question": "How do I invite people to my event?", "answer": "When creating or viewing an event, use the 'Invite' button to send invitations to your connections. You can also share a link for others to join." },
-  { "question": "What types of events can I create?", "answer": "MeetMate supports all kinds of events: meetings, workshops, social gatherings, and more. Choose the type that fits your needs and customize it as you wish." },
-  { "question": "How do I cancel or reschedule an event?", "answer": "Go to your event page and select 'Cancel' or 'Reschedule'. Notify attendees with a message so everyone stays informed. We appreciate your courtesy!" },
-  { "question": "Can I sync MeetMate with my calendar?", "answer": "Yes, MeetMate supports calendar sync with Google Calendar and other providers. Go to Settings > Integrations to set it up." },
-  { "question": "How do I get reminders for meetings?", "answer": "Enable notifications in Settings to receive reminders for upcoming meetings and events. You can customize how and when you’re notified." },
-  { "question": "Is there a limit to the number of connections I can have?", "answer": "No, you can connect with as many users as you like. We encourage you to build a vibrant network!" },
-  { "question": "How do I search for users or events?", "answer": "Use the search bar at the top of your dashboard to find users, events, or topics. Filters help you narrow down your results." },
-  { "question": "Can I share files in MeetMate chat?", "answer": "Yes, you can securely share files and links in chat. Please ensure all shared content is appropriate and respectful." },
-  { "question": "How do I update my notification preferences?", "answer": "Go to Settings > Notifications to adjust your preferences for messages, events, and other alerts." },
-  { "question": "What happens if I forget my username?", "answer": "Your username is usually your email. If you need help, contact support and we’ll help you recover your account." },
-  { "question": "How do I report technical issues?", "answer": "If you encounter a bug or issue, please use the 'Report a Problem' feature in the app or email support@meetmate.com. We appreciate your feedback!" },
-  { "question": "Can I use MeetMate internationally?", "answer": "Yes, MeetMate is available worldwide. Connect and collaborate with users from different countries and cultures." },
-  { "question": "Is MeetMate suitable for business networking?", "answer": "Definitely! MeetMate is designed for both personal and professional networking. Use it to grow your business contacts and opportunities." },
-  { "question": "How do I access MeetMate on different devices?", "answer": "MeetMate works on desktops, laptops, tablets, and mobile browsers. A dedicated mobile app is coming soon!" },
-  { "question": "Can I customize event privacy settings?", "answer": "Yes, when creating or editing an event, you can choose privacy options to control who can see and join your event." },
-  { "question": "How do I leave feedback for MeetMate?", "answer": "We love hearing from you! Use the 'Feedback' form in the app or email us directly. Your suggestions help us improve." },
-  { "question": "What languages does MeetMate support?", "answer": "Currently, MeetMate is available in English. We plan to add more languages soon to serve our global community." },
-  { "question": "How do I enable dark mode?", "answer": "Go to Settings > Appearance and select 'Dark Mode' for a comfortable viewing experience." },
-  { "question": "Can I recover deleted messages?", "answer": "Deleted messages cannot be recovered for privacy reasons. Please be careful before deleting important information." },
-  { "question": "How do I manage my subscription?", "answer": "Go to Account Settings > Subscription to view, upgrade, or cancel your plan. Our support team can help with any questions." },
-  { "question": "Does MeetMate offer analytics?", "answer": "Premium users have access to advanced analytics for events, connections, and engagement. Upgrade to unlock these insights!" },
-  { "question": "How do I get help with onboarding?", "answer": "Our onboarding guide is available in the Help section. You can also chat with support for personalized assistance." },
-  { "question": "Can I use MeetMate for virtual events?", "answer": "Yes, MeetMate supports virtual events with integrated chat and scheduling. Host or join online meetings with ease." },
-  { "question": "How do I set my availability?", "answer": "Go to your profile or calendar and set your available times. This helps others schedule meetings that work for you." },
-  { "question": "Is there a referral program?", "answer": "Yes! Invite friends to MeetMate and earn rewards. Details are available in your dashboard under 'Referral Program'." }
 ]

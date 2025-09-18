@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 120" width="280" height="120">
+  <rect width="100%" height="100%" rx="8" fill="#0b1220" />
+  <rect x="18" y="14" width="64" height="64" rx="8" fill="#0b1220" stroke="#2a6fff" stroke-width="4" />
+  <text x="56" y="62" fill="#2a6fff" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="28">S</text>
+  <text x="106" y="78" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="18">Stripe</text>
+</svg>

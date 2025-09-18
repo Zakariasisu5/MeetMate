@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 120" width="280" height="120">
+  <rect width="100%" height="100%" rx="8" fill="#111827" />
+  <g transform="translate(18,18)">
+    <rect width="40" height="40" fill="#F35325" rx="4" />
+    <rect x="46" width="40" height="40" fill="#81BC06" rx="4" />
+    <rect y="46" width="40" height="40" fill="#00A4EF" rx="4" />
+    <rect x="46" y="46" width="40" height="40" fill="#FFD400" rx="4" />
+  </g>
+  <text x="120" y="70" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="18">Microsoft</text>
+</svg>

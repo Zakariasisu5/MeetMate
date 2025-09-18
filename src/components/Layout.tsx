@@ -19,14 +19,23 @@ import ThemeToggle from './ui/ThemeToggle'
 import Footer from './Footer'
 //import AIChat from './AIChat'
 import AIChatbot from './AIChatbot'
+import SettingsModal from './SettingsModal'
+import { SettingsProvider, useSettings } from '../contexts/SettingsContext'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
+  // Demo notifications (two items)
+  const [notifications, setNotifications] = useState([
+    { id: 'n1', title: 'New match with Alex', time: '2m ago', read: false },
+    { id: 'n2', title: 'Event reminder: Team Sync', time: '1h ago', read: false }
+  ])
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { user, userProfile, signOut } = useFirebaseAuth()
+  const { settings } = useSettings()
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
@@ -88,14 +97,32 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex items-center space-x-4">
               {/* Theme Toggle */}
               <ThemeToggle />
+              {/* Settings button */}
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                aria-label="Settings"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
               
               {/* Notifications */}
               <div className="relative">
                 <button
-                  className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
-                  onClick={() => setIsNotifOpen(!isNotifOpen)}
+                  className={`relative p-2 ${settings.notificationsEnabled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-white/30 cursor-not-allowed'} rounded-lg transition-all duration-200`}
+                  onClick={() => {
+                    if (!settings.notificationsEnabled) return
+                    setIsNotifOpen(!isNotifOpen)
+                    // mark all demo notifications as read when opening
+                    if (!isNotifOpen) setNotifications((prev) => prev.map(n => ({ ...n, read: true })))
+                  }}
+                  aria-label="Notifications"
                 >
                   <Bell className="w-5 h-5" />
+                  {/* Unread badge */}
+                  {settings.notificationsEnabled && notifications.filter(n => !n.read).length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] px-1.5 py-0.5">{notifications.filter(n => !n.read).length}</span>
+                  )}
                 </button>
                 <AnimatePresence>
                   {isNotifOpen && (
@@ -104,11 +131,21 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-64 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 py-2 z-50"
+                      className="absolute right-0 mt-2 w-80 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 py-2 z-50"
                     >
                       <div className="px-4 py-2 text-sm text-white/80">Notifications</div>
                       <div className="border-t border-white/10 my-1" />
-                      <div className="px-4 py-2 text-sm text-white/60">No new notifications.</div>
+                      <div className="max-h-56 overflow-y-auto">
+                        {notifications.length === 0 && (
+                          <div className="px-4 py-2 text-sm text-white/60">No notifications.</div>
+                        )}
+                        {notifications.map((n) => (
+                          <div key={n.id} className={`px-4 py-3 text-sm ${n.read ? 'text-white/60' : 'text-white'} hover:bg-white/5 cursor-default`}>
+                            <div className="font-semibold">{n.title}</div>
+                            <div className="text-xs mt-1 text-white/50">{n.time}</div>
+                          </div>
+                        ))}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -234,6 +271,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
       <Footer />
+  <SettingsModal open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <AIChatbot />
       {/*<AIChat />*/}
     </div>

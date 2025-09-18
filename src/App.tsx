@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useFirebaseAuth } from './hooks/useFirebaseAuth'
 import Layout from './components/Layout'
+import { SettingsProvider } from './contexts/SettingsContext'
 import Home from './pages/Home'
 import Events from './pages/Events'
 import Auth from './pages/Auth'
@@ -131,7 +132,9 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AppRoutes />
+          <SettingsProvider>
+            <AppRoutes />
+          </SettingsProvider>
           <Toaster
             position="top-right"
             toastOptions={{

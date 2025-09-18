@@ -269,3 +269,211 @@
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
+
+/* Marquee styles for testimonials and sponsors */
+:root {
+  --marquee-duration: 55s; /* slower — increase for a more relaxed scroll */
+}
+
+@keyframes marquee-left {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+.marquee {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.marquee-left .marquee-track { animation: marquee-left var(--marquee-duration) cubic-bezier(.16,.84,.44,1) infinite; }
+.marquee-right .marquee-track { animation: marquee-right var(--marquee-duration) cubic-bezier(.16,.84,.44,1) infinite; }
+
+/* Pause animation on hover for readability */
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+/* Edge fade masks for a smoother entrance/exit */
+.marquee::before,
+.marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6rem;
+  pointer-events: none;
+  z-index: 10;
+}
+.marquee::before { left: 0; background: linear-gradient(90deg, rgba(0,0,0,0.6), transparent); }
+.marquee::after { right: 0; background: linear-gradient(-90deg, rgba(0,0,0,0.6), transparent); }
+
+.testimonial-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  padding: 0.85rem 1.1rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.95);
+  min-width: 260px;
+  max-width: 520px; /* allow longer cards */
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.testimonial-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.06);
+}
+
+.testimonial-text {
+  font-size: 0.95rem;
+  line-height: 1.3rem;
+  color: rgba(255,255,255,0.95);
+  max-width: 36rem;
+  white-space: normal; /* allow wrapping */
+}
+
+.testimonial-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.testimonial-author {
+  white-space: normal;
+}
+
+.sponsor-badge {
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.95);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 160px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.28);
+}
+
+/* Sponsor queue (smooth continuous left-to-right) */
+.sponsor-queue {
+  --sponsor-speed: 36s; /* lower = faster */
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 8px 4px;
+}
+.sponsor-track {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  will-change: transform;
+  animation: sponsor-scroll var(--sponsor-speed) linear infinite;
+}
+.sponsor-queue:hover .sponsor-track { animation-play-state: paused; }
+
+@keyframes sponsor-scroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Each duplicate set should be wide enough; limit card shrink */
+.sponsor-queue-item { flex: 0 0 auto; }
+
+
+.sponsor-logo {
+  max-width: 140px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+  background: transparent; /* allow transparent PNG/SVG logos to show */
+  padding: 0; /* remove forced white padding */
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6)); /* subtle lift on dark bg */
+}
+
+.sponsor-logo-wrap {
+  width: 140px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 6px; /* small inner padding for balance */
+  background: rgba(255,255,255,0.02); /* subtle contrast, not a white box */
+  border-radius: 8px;
+}
+
+.sponsor-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sponsor card system (tier-specific names removed) */
+.sponsor-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+}
+.sponsor-card:hover { transform: translateY(-6px); }
+.sponsor-card .tier-label { color: rgba(255,255,255,0.95); }
+
+/* Previously had Gold/Silver/Bronze tier-specific styles; tiers simplified to a single neutral sponsor style. */
+
+/* Ensure consistent sizing across cards */
+.sponsor-card img { max-width: 100%; max-height: 100%; }
+
+/* Neutral sponsor style (modern, minimalist) */
+.sponsor-card--neutral {
+  background: linear-gradient(180deg, rgba(18,18,20,0.9), rgba(28,28,30,0.9));
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.sponsor-card--neutral .tier-label { color: rgba(255,255,255,0.9); }
+.sponsor-card--neutral .industry-icon { background: rgba(255,255,255,0.03); }
+
+/* Sponsor name display */
+.sponsor-name-display { max-width: 100%; }
+.sponsor-name-title { color: rgba(255,255,255,0.95); font-family: Inter, Arial, sans-serif; font-size: 0.95rem; }
+.sponsor-card .sponsor-name-title { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+/* Logo wrapper and overlay: places a semi-transparent label on top of the logo */
+.logo-wrapper { position: relative; }
+.sponsor-name-overlay { pointer-events: none; }
+.sponsor-name-overlay-text {
+  background: linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35));
+  color: #ffffff;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Tier-specific overlay tweaks to ensure contrast */
+.sponsor-card--neutral .sponsor-name-overlay-text { background: linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35)); color: #ffffff; }
+
+/* Stronger tier-specific treatments */
+
+/* Removed tier-specific gold/silver/bronze styles in favor of the neutral sponsor style above. */
+
+

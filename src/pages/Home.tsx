@@ -21,10 +21,12 @@ import GlassCard from '../components/ui/GlassCard'
 import NeonButton from '../components/ui/NeonButton'
 import AIChatbot from '../components/ui/AIChatbot'
 import ProfileCard from '../components/ui/ProfileCard'
+import SponsorCard from '../components/SponsorCard'
 import { useFirebaseAuth } from '../hooks/useFirebaseAuth'
 import ConnectModal from '../components/ConnectModal'
 import MessageModal from '../components/MessageModal'
 import CalendarModal from '../components/CalendarModal'
+import { Cpu, Slack as SlackIcon, FileText, CreditCard, Video, Database, MessageSquare } from 'lucide-react'
 
 const Home = () => {
   // Modal state
@@ -215,46 +217,95 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Stats Section */}
-  <section className="relative py-20">
-          <GlassCard className="p-12 md:p-16">
+        {/* Testimonials Section */}
+  <section className="relative py-12">
+          <GlassCard className="p-8 md:p-10 space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-center space-y-12"
+              className="text-center"
             >
-              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-teal-400 bg-clip-text text-transparent font-heading">
-                Trusted by thousands of conference attendees
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-teal-400 bg-clip-text text-transparent font-heading">
+                What attendees are saying
               </h2>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-                {stats.map((stat, index) => {
-                  const Icon = stat.icon
-                  return (
-                    <motion.div
-                      key={stat.label}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                      viewport={{ once: true }}
-                      className="text-center"
-                    >
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
-                        <Icon className="h-8 w-8 text-blue-400" />
-                      </div>
-                      <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-3">
-                        {stat.value}
-                      </div>
-                      <div className="text-white/60">
-                        {stat.label}
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+              <p className="text-white/60 mt-2">Real feedback from conference users — rotating in real-time.</p>
             </motion.div>
+
+            <div className="marquee marquee-left">
+              <div className="marquee-track">
+                {[
+                  { id: 1, text: 'MeetMate introduced me to speakers I would never have found.', author: 'Anna C.', avatar: 'https://i.pravatar.cc/100?img=32' },
+                  { id: 2, text: 'The AI match suggestions were shockingly accurate.', author: 'Marcus R.', avatar: 'https://i.pravatar.cc/100?img=12' },
+                  { id: 3, text: 'Saved so much time between sessions — highly recommend.', author: 'Sarah K.', avatar: 'https://i.pravatar.cc/100?img=7' },
+                  { id: 4, text: 'Great tool for follow-ups and scheduling.', author: 'David T.', avatar: 'https://i.pravatar.cc/100?img=14' }
+                ].map((t) => (
+                  <div key={t.id} className="testimonial-card">
+                    <img src={t.avatar} alt={t.author} className="testimonial-avatar" />
+                    <div className="testimonial-content min-w-0">
+                      <div className="testimonial-text">“{t.text}”</div>
+                      <div className="text-xs text-white/60 mt-1 font-semibold testimonial-author">— {t.author}</div>
+                    </div>
+                  </div>
+                ))}
+                {[
+                  { id: 11, text: 'MeetMate introduced me to speakers I would never have found.', author: 'Anna C.', avatar: 'https://i.pravatar.cc/100?img=32' },
+                  { id: 12, text: 'The AI match suggestions were shockingly accurate.', author: 'Marcus R.', avatar: 'https://i.pravatar.cc/100?img=12' },
+                  { id: 13, text: 'Saved so much time between sessions — highly recommend.', author: 'Sarah K.', avatar: 'https://i.pravatar.cc/100?img=7' },
+                  { id: 14, text: 'Great tool for follow-ups and scheduling.', author: 'David T.', avatar: 'https://i.pravatar.cc/100?img=14' }
+                ].map((t) => (
+                  <div key={t.id} className="testimonial-card">
+                    <img src={t.avatar} alt={t.author} className="testimonial-avatar" />
+                    <div className="testimonial-content min-w-0">
+                      <div className="testimonial-text">“{t.text}”</div>
+                      <div className="text-xs text-white/60 mt-1 font-semibold testimonial-author">— {t.author}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </section>
+
+        {/* Sponsors Section - New Card Grid */}
+  <section className="relative py-12">
+          <GlassCard className="p-6 md:p-8 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <h3 className="text-2xl md:text-3xl font-bold text-white font-heading">Sponsors</h3>
+              <p className="text-white/60 mt-1">Proud partners helping make MeetMate possible.</p>
+            </motion.div>
+
+            {/* Continuous sponsor queue (left → right) */}
+            <div className="sponsor-queue overflow-hidden">
+              <div className="sponsor-track">
+                {[ 
+                  { id: 'sensayai', name: 'SensayAI', logo: '/logos/sensayai.png', tier: 'Sponsor', Icon: MessageSquare, url: 'https://sensay.ai' },
+                  { id: 'microsoft', name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com', tier: 'Sponsor', Icon: Cpu, url: 'https://microsoft.com' },
+                  { id: 'slack', name: 'Slack', logo: 'https://logo.clearbit.com/slack.com', tier: 'Sponsor', Icon: SlackIcon, url: 'https://slack.com' },
+                  { id: 'notion', name: 'Notion', logo: 'https://logo.clearbit.com/notion.so', tier: 'Sponsor', Icon: FileText, url: 'https://www.notion.so' },
+                  { id: 'stripe', name: 'Stripe', logo: 'https://logo.clearbit.com/stripe.com', tier: 'Sponsor', Icon: CreditCard, url: 'https://stripe.com' },
+                  { id: 'zoom', name: 'Zoom', logo: 'https://logo.clearbit.com/zoom.us', tier: 'Sponsor', Icon: Video, url: 'https://zoom.us' }
+                ].concat([
+                  { id: 'sensayai2', name: 'SensayAI', logo: '/logos/sensayai.png', tier: 'Sponsor', Icon: MessageSquare, url: 'https://sensay.ai' },
+                  { id: 'microsoft2', name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com', tier: 'Sponsor', Icon: Cpu, url: 'https://microsoft.com' },
+                  { id: 'slack2', name: 'Slack', logo: 'https://logo.clearbit.com/slack.com', tier: 'Sponsor', Icon: SlackIcon, url: 'https://slack.com' },
+                  { id: 'notion2', name: 'Notion', logo: 'https://logo.clearbit.com/notion.so', tier: 'Sponsor', Icon: FileText, url: 'https://www.notion.so' },
+                  { id: 'stripe2', name: 'Stripe', logo: 'https://logo.clearbit.com/stripe.com', tier: 'Sponsor', Icon: CreditCard, url: 'https://stripe.com' },
+                  { id: 'zoom2', name: 'Zoom', logo: 'https://logo.clearbit.com/zoom.us', tier: 'Sponsor', Icon: Video, url: 'https://zoom.us' }
+                ]).map((s) => (
+                  <div key={s.id} className="sponsor-queue-item inline-block mr-6">
+                    <SponsorCard name={s.name} logoUrl={s.logo} tier={s.tier as any} Icon={s.Icon} />
+                  </div>
+                ))}
+              </div>
+            </div>
           </GlassCard>
         </section>
 

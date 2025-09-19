@@ -26,4 +26,6 @@
     
   },
   "include": ["src"]
+  ,
+  "exclude": ["src/sensayAI/api"]
 }

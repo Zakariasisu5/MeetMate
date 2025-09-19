@@ -10,7 +10,7 @@ type Faq = {
 type Message = {
   text: string;
   isUser: boolean;
-  source?: 'meetmate-faq' | 'synthesized' | 'fallback' | 'system';
+  source?: 'SensayAPI' | 'synthesized' | 'fallback' | 'system' | 'meetmate-faq';
 };
 
 const unrelatedKeywords = [
@@ -163,11 +163,11 @@ export default function AIChatbot() {
             <Sparkles className="w-5 h-5 text-yellow-300 drop-shadow-lg" />
           </div>
           {/* Powered by Sensay */}
-          <div className="px-4 py-1 bg-white/10 text-xs text-white/70 text-right font-medium border-b border-white/10">
-            🤖 Powered by Sensay AI
+            <div className="px-4 py-1 bg-white/10 text-xs text-white/70 text-right font-medium border-b border-white/10">
+              🤖 Powered by Sensay AI
           </div>
           {/* Messages */}
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-[350px] custom-scrollbar">
+            <div className="p-4 space-y-4 overflow-y-auto max-h-[60vh] custom-scrollbar">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] p-3 rounded-2xl shadow-md transition-all ${msg.isUser ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' : 'bg-white/20 text-white/90 backdrop-blur-md border border-white/10'}`}>

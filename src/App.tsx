@@ -13,6 +13,7 @@ import Matches from './pages/Matches'
 import Schedule from './pages/Schedule'
 import Dashboard from './pages/Dashboard'
 import FontTest from './components/FontTest'
+import AIChatAssistant from './sensayAI/AIChatAssistant'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -114,6 +115,13 @@ function AppRoutes() {
         <ProtectedRoute>
           <Layout>
             <Dashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/sensay" element={
+        <ProtectedRoute>
+          <Layout>
+            <AIChatAssistant />
           </Layout>
         </ProtectedRoute>
       } />

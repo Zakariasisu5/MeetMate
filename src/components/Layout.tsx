@@ -21,6 +21,8 @@ import Footer from './Footer'
 import AIChatbot from './AIChatbot'
 import SettingsModal from './SettingsModal'
 import { SettingsProvider, useSettings } from '../contexts/SettingsContext'
+import AIChatAssistant from './AIChatAssistant'
+
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -274,6 +276,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   <SettingsModal open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <AIChatbot />
       {/*<AIChat />*/}
+      <AIChatAssistant />
     </div>
   )
 }

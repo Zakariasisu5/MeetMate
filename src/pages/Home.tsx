@@ -241,7 +241,7 @@ const Home = () => {
                   { id: 3, text: 'Saved so much time between sessions — highly recommend.', author: 'Sarah K.', avatar: 'https://i.pravatar.cc/100?img=7' },
                   { id: 4, text: 'Great tool for follow-ups and scheduling.', author: 'David T.', avatar: 'https://i.pravatar.cc/100?img=14' }
                 ].map((t) => (
-                  <div key={t.id} className="testimonial-card">
+                  <div key={t.id} className="testimonial-card sm:min-w-[260px] w-full">
                     <img src={t.avatar} alt={t.author} className="testimonial-avatar" />
                     <div className="testimonial-content min-w-0">
                       <div className="testimonial-text">“{t.text}”</div>
@@ -255,7 +255,7 @@ const Home = () => {
                   { id: 13, text: 'Saved so much time between sessions — highly recommend.', author: 'Sarah K.', avatar: 'https://i.pravatar.cc/100?img=7' },
                   { id: 14, text: 'Great tool for follow-ups and scheduling.', author: 'David T.', avatar: 'https://i.pravatar.cc/100?img=14' }
                 ].map((t) => (
-                  <div key={t.id} className="testimonial-card">
+                  <div key={t.id} className="testimonial-card sm:min-w-[260px] w-full">
                     <img src={t.avatar} alt={t.author} className="testimonial-avatar" />
                     <div className="testimonial-content min-w-0">
                       <div className="testimonial-text">“{t.text}”</div>

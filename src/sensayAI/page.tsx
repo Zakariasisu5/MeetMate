@@ -22,21 +22,20 @@ export default function SensayPage() {
   const frontendSensayUrl = (import.meta.env.VITE_SENSAY_API_URL as string) || 'https://api.sensay.io/v1';
   const replicaUuid = (import.meta.env.VITE_SENSAY_REPLICA_UUID as string) || '';
   const frontendUserId = (import.meta.env.VITE_SENSAY_USER_ID as string) || '';
-  if (!frontendSensayKey) {
-    // We'll still render the page, but show an instructive error in the UI when trying to send.
-    console.warn('VITE_SENSAY_API_KEY is not set. Sensay frontend will not work until this is configured.');
-  }
   const endpoints = [`${frontendSensayUrl.replace(/\/$/, '')}/chat/completions`];
 
   async function postToFirstWorking(urls: string[], payload: any) {
     let lastErr: any = null;
     for (const u of urls) {
       try {
-        // This is always a direct Sensay endpoint in frontend-only mode.
+        // Always call Sensay directly from the browser.
         if (u.includes('/chat/completions')) {
-          // If a replica UUID is provided, target the replica path and use org/user headers
+          if (!frontendSensayKey) {
+            throw new Error('VITE_SENSAY_API_KEY not set in frontend environment');
+          }
+
+          // If a replica UUID is provided, use replica path and send org/user headers.
           if (replicaUuid) {
-            if (!frontendSensayKey) throw new Error('VITE_SENSAY_API_KEY not set in frontend environment');
             const replicaUrl = `${frontendSensayUrl.replace(/\/$/, '')}/replicas/${encodeURIComponent(replicaUuid)}/chat/completions`;
             const headers: Record<string,string> = {
               'Content-Type': 'application/json',
@@ -57,9 +56,7 @@ export default function SensayPage() {
             return data;
           }
 
-          if (!frontendSensayKey) {
-            throw new Error('VITE_SENSAY_API_KEY not set in frontend environment');
-          }
+          // Default non-replica Sensay call (Bearer auth)
           const res = await fetch(u, {
             method: 'POST',
             headers: {
@@ -78,15 +75,6 @@ export default function SensayPage() {
           if (!res.ok) throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
           return data;
         }
-
-        const res = await fetch(u, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
-        return data;
       } catch (e) {
         lastErr = e;
       }
@@ -150,7 +138,7 @@ export default function SensayPage() {
         {error && <div className="mb-3 text-red-600">{error}</div>}
         {!frontendSensayKey && (
           <div className="mb-3 text-yellow-700 bg-yellow-50 p-2 rounded text-sm">
-            VITE_SENSAY_API_KEY is not set. The assistant will not work until you add this key to your front-end env.
+            VITE_SENSAY_API_KEY is not set. This page runs Sensay entirely in the browser. Add <code className="bg-gray-100 px-1 py-0.5 rounded">VITE_SENSAY_API_KEY</code> to your front-end env and rebuild.
           </div>
         )}
 
@@ -162,9 +150,9 @@ export default function SensayPage() {
             className="flex-1 border p-2 rounded resize-none"
             rows={3}
             placeholder="Type a message... (Enter to send, Shift+Enter for newline)"
-            disabled={loading}
+            disabled={loading || !frontendSensayKey}
           />
-          <button onClick={send} className="px-4 py-2 bg-blue-600 text-white rounded" disabled={loading}>
+          <button onClick={send} className="px-4 py-2 bg-blue-600 text-white rounded" disabled={loading || !frontendSensayKey}>
             {loading ? 'Sending...' : 'Send'}
           </button>
         </div>

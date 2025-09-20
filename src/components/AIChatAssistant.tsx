@@ -19,21 +19,27 @@ export default function AIChatAssistantFloating() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading, isOpen]);
 
-  // Frontend-only Sensay config
+  // Frontend-only Sensay config (no backend proxy)
   const frontendSensayKey = import.meta.env.VITE_SENSAY_API_KEY as string | undefined;
   const frontendSensayUrl = (import.meta.env.VITE_SENSAY_API_URL as string) || 'https://api.sensay.io/v1';
   const replicaUuid = (import.meta.env.VITE_SENSAY_REPLICA_UUID as string) || '';
   const frontendUserId = (import.meta.env.VITE_SENSAY_USER_ID as string) || '';
 
+  // Only direct Sensay endpoints are used in frontend-only mode.
   const endpoints = [`${frontendSensayUrl.replace(/\/$/, '')}/chat/completions`];
 
   async function postToFirstWorking(urls: string[], payload: any) {
     let lastErr: any = null;
     for (const u of urls) {
       try {
+        // Always call Sensay directly from the browser.
         if (u.includes('/chat/completions')) {
+          if (!frontendSensayKey) {
+            throw new Error('VITE_SENSAY_API_KEY not set in frontend environment');
+          }
+
+          // If a replica UUID is provided, use replica path and send org/user headers.
           if (replicaUuid) {
-            if (!frontendSensayKey) throw new Error('VITE_SENSAY_API_KEY not set in frontend environment');
             const replicaUrl = `${frontendSensayUrl.replace(/\/$/, '')}/replicas/${encodeURIComponent(replicaUuid)}/chat/completions`;
             const headers: Record<string,string> = {
               'Content-Type': 'application/json',
@@ -46,7 +52,7 @@ export default function AIChatAssistantFloating() {
               body: JSON.stringify({
                 content: payload.message ?? payload.query,
                 source: 'web',
-                skip_chat_history: false
+                skip_chat_history: false,
               })
             });
             const data = await res.json();
@@ -54,9 +60,7 @@ export default function AIChatAssistantFloating() {
             return data;
           }
 
-          if (!frontendSensayKey) {
-            throw new Error('VITE_SENSAY_API_KEY not set in frontend environment');
-          }
+          // Default non-replica Sensay call (Bearer auth)
           const res = await fetch(u, {
             method: 'POST',
             headers: {
@@ -75,15 +79,6 @@ export default function AIChatAssistantFloating() {
           if (!res.ok) throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
           return data;
         }
-
-        const res = await fetch(u, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
-        return data;
       } catch (e) {
         lastErr = e;
       }
@@ -186,7 +181,7 @@ export default function AIChatAssistantFloating() {
             {error && <div className="mb-3 text-red-400">{error}</div>}
             {!frontendSensayKey && (
               <div className="mb-3 text-yellow-200 bg-yellow-800/20 p-2 rounded text-sm">
-                VITE_SENSAY_API_KEY is not set. The assistant will not work until you add this key to your front-end env.
+                VITE_SENSAY_API_KEY is not set. This assistant is frontend-only and requires a Sensay API key in your front-end env to work. Add <code className="bg-black/20 px-1 py-0.5 rounded">VITE_SENSAY_API_KEY</code> and rebuild the site.
               </div>
             )}
 
